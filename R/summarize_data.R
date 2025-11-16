@@ -14,6 +14,9 @@
 #'        Default = c(0.2, 0.5, 0.8).
 #'
 #' @return A data.frame of summary results, one row per dataset.
+#' @example
+#' sum_data = summarize_data(country_filter = "at97")
+#' View(sum_data)
 #' @export
 #'
 summarize_data <- function(indices = NA,
@@ -38,6 +41,7 @@ summarize_data <- function(indices = NA,
     if (is.null(df) || nrow(df) == 0) next
 
     y <- df[[variable]]
+    y=y[y>0]
     N <- length(y)
 
     # ---- 2. Mean & SE ----
@@ -50,12 +54,12 @@ summarize_data <- function(indices = NA,
 
     # ---- 4. Quantiles ----
     if (percentiles) {
-      qs <- quantile(y, probs = seq(0.01, 1, 0.01), names = TRUE)
-      quant_names <- names(qs)
+      qs <- income_decile_shares(y,probs = seq(0.01, 1, 0.01), names = TRUE) #quantile(y, probs = seq(0.01, 1, 0.01), names = TRUE)
+      #quant_names <- names(qs)
     } else {
-      qs <- quantile(y, probs = seq(0.1, 1, 0.1), names = TRUE)
-      quant_names <- paste0("d", 1:10)
-      names(qs) <- quant_names
+      qs <- income_decile_shares(y,probs = seq(0.01, 1, 0.1), names = TRUE)
+      #quant_names <- paste0("d", 1:10)
+      #names(qs) <- quant_names
     }
 
     # ---- 5. Poverty lines & headcounts ----

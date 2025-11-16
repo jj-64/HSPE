@@ -100,3 +100,26 @@ Outlier_range = function(fyy2,r=1.5){
   r2 = mean(fyy2) + r*IQR(fyy2)
   return(c(r1,r2))
 }
+
+
+## Income deciles from observed micro data
+income_decile_shares <- function(y, probs = seq(0.01, 1, by = 0.1) , names = TRUE) {
+  y <- sort(y)
+  n <- length(y)
+
+  # Decile cutpoints
+  decile_indices <- floor(probs * n)
+  decile_indices[decile_indices == 0] <- 1
+
+  # Compute cumulative income shares
+  cum_income <- cumsum(y)
+  total_income <- sum(y)
+
+  # Income share at each decile
+  shares <- cum_income[decile_indices] / total_income * 100
+
+  if(names){
+  names(shares) <- paste0("d", 1:length(probs)) }
+  return(shares)
+}
+
