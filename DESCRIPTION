@@ -1,5 +1,5 @@
-Package: LIS
-Title: LIS Data Estimation
+Package: HSPE
+Title: Household Survey Parameter Estimation
 Version: 0.0.0.9000
 Authors@R: 
     person("Jinane", "Jouni", , "jinane.jouni@hotmail.com", role = c("aut", "cre"),
