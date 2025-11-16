@@ -1,30 +1,107 @@
-read_LIS_data <-  function(indices = NA, variable = "dhi", raw = FALSE){
+#' Read LIS Microdata from .dta Files
+#'
+#' This function reads multiple LIS microdata files (Stata .dta format) from the
+#' HSPE data directory, extracts a chosen variable and household weights, and
+#' optionally expands the data using household weights.
+#'
+#' @param indices Integer vector of file indices to read.
+#'   If `NA` (default), all files are read unless `country_filter` is used.
+#'
+#' @param variable Character string.
+#'   The variable name to extract from each dataset (default = `"dhi"`).
+#'
+#' @param raw Logical.
+#'   If `TRUE`, household weights are used to expand each record (replicate rows).
+#'
+#' @param country_filter Character or NULL.
+#'   A text pattern or vector of patterns used to select only files whose
+#'   filenames contain these substrings (e.g., `"at97"`).
+#'   If multiple values: any matching file will be included.
+#'
+#' @return A named list where each element is a cleaned dataset for one file.
+#' @export
+#'
+#' @examples
+#' # Read all files:
+#' # read_LIS_data()
+#'
+#' # Read only files containing "at97"
+#' # read_LIS_data(country_filter = "at97")
+#'
+#' # Read 3 specific files with row replication
+#' # read_LIS_data(indices = c(1, 3, 5), raw = TRUE)
+#'
+read_data <- function(indices = NA,
+                          variable = "dhi",
+                          raw = FALSE,
+                          country_filter = NULL) {
 
-## Store files names only
-files <- list.files( "C:/Users/User/Documents/HSPE/DATA/", pattern = "\\.dta$", full.names = TRUE)
+  # ---- 1. List all .dta files ----
+  files <- list.files(
+    "C:/Users/User/Documents/HSPE/DATA/",
+    pattern = "\\.dta$",
+    full.names = TRUE
+  )
 
-## survey number
-if(is.na(indices[1])) {indices = (1:length(files))}
-#c(3, 7, 12, 14, 22, 24, 26, 27, 29, 33) ##
+  # Short file names (for labeling output)
+  file_names <- basename(files)
 
-## store results
-results = list()
+  # ---- 2. Apply country filter (if provided) ----
+  if (!is.null(country_filter)) {
+    match_pattern <- paste(country_filter, collapse = "|")
+    keep <- grepl(match_pattern, file_names, ignore.case = TRUE)
 
-######################### Implement on all Countries #################3
-for (i in indices) { ##
+    files <- files[keep]
+    file_names <- file_names[keep]
 
-  # Read and process each file (your existing code)
-  file <- files[i]
-  data <- haven::read_dta(file)
+    if (length(files) == 0) {
+      stop("No .dta files matched the provided country_filter.")
+    }
 
-  microdata = data[,c("hwgt", variable)]
-  microdata= microdata[complete.cases(microdata),]
+    # If user supplied indices, apply to filtered files
+    if (!is.na(indices[1])) {
+      files <- files[indices]
+      file_names <- file_names[indices]
+    }
 
-  ## Expand data by HH weight
-  if(raw){
-  microdata$hwgt <- round(microdata$hwgt*10, 0)  ## multiply HHweight by 10 to minimize expansion error
-  microdata=replicate_rows(microdata)
+  } else {
+    # No filter → use indices on full list
+    if (is.na(indices[1])) indices <- seq_along(files)
+    files <- files[indices]
+    file_names <- file_names[indices]
   }
-results[[i]] = microdata
-              }
+
+  # ---- 3. Prepare output list ----
+  results <- vector("list", length(files))
+  names(results) <- file_names
+
+  # ---- 4. Process each file ----
+  for (j in seq_along(files)) {
+
+    file <- files[j]
+
+    message("Reading file: ", file_names[j], " ...")
+
+    data <- haven::read_dta(file)
+
+    # Check variables exist
+    if (!all(c("hwgt", variable) %in% names(data))) {
+      warning("Skipping file ", file_names[j], ": required variables missing.")
+      next
+    }
+
+    # Extract and clean
+    microdata <- data[, c("hwgt", variable)]
+    microdata <- microdata[complete.cases(microdata), ]
+
+    # ---- 5. Expand using household weights ----
+    if (raw) {
+      microdata$hwgt <- round(microdata$hwgt * 10, 0)
+      microdata <- replicate_rows(microdata)
+    }
+
+    results[[j]] <- microdata
+  }
+
+  return(results)
 }
