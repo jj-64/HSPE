@@ -1,1 +1,0 @@
-data = summarize_data()

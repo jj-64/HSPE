@@ -1,19 +1,3 @@
-library(dplyr)
-##Function to expand data according to HH weight vector -----------
-replicate_rows <- function(df) {
-  df = df %>%
-    slice(rep(1:n(), hwgt))  %>%
-    ungroup()
-  return(as.data.frame(df))
-}
-
-##Function to expand data according to HH weight vector -------------
-replicate_rows_p <- function(df) {
-  df = df %>%
-    slice(rep(1:n(), pwgt))  %>%
-    ungroup()
-  return(as.data.frame(df))
-}
 
 
 ## Compute Gini index from raw data without any expansion but using HHWeight ---------
