@@ -38,7 +38,7 @@ read_data <- function(indices = NA,
 
   # ---- 1. List all .dta files ----
   files <- list.files(
-    "C:/Users/User/Documents/HSPE/DATA/",
+    here::here("DATA"),
     pattern = "\\.dta$",
     full.names = TRUE
   )
