@@ -50,7 +50,7 @@ for(i in seq_along(data)){
     ## Loop over all models
     for(model in models) {
 
-      fit <- fit_model(model, L_nonCum, mean_y = Average, Gini = Gini1, N = N)
+      fit <- fit_model_grouped(model, L_nonCum, mean_y = Average, Gini = Gini1, N = N)
       if(!fit$ok){
         Param <- compute_param_summary2(Param, model, NA, NA)
         HC <- NA

@@ -354,7 +354,7 @@ compute_headcounts2 <- function(Country, data, L_nonCum, mean_y, Gini, N, PL_val
 
   for (model in names(CDF_registry)) {
 
-    fit <- fit_model(model, L_nonCum, mean_y, Gini, N)
+    fit <- fit_model_grouped(model, L_nonCum, mean_y, Gini, N)
     if (!fit$ok) next
 
     cdffun <- get(dist_registry[[model]]$cdffun)

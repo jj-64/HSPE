@@ -1,5 +1,5 @@
 # Helper: Fit a grouped model -----------------------------
-fit_model <- function(model =c("DA","SM","B2","GB2","FISK","LN","NP"), L_nonCum, mean_y, Gini, N) {
+fit_model_grouped <- function(model =c("DA","SM","B2","GB2","FISK","LN","NP"), L_nonCum, mean_y, Gini, N) {
 
   if (!all(model %in% c("DA","SM","B2","GB2","FISK","LN","NP"))) {
     stop("models must be one of:  DA, SM, Beta2, GB2, FISK ,LN","NP")
