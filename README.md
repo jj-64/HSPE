@@ -1,2 +1,11 @@
 # HSPE
 Household Survey Parameter Estimation
+
+#1 - Create summarized data
+In the "Execution"" folder, the code "Create Summarized data.R" will read each LIS.dat file from the "DATA" folder.
+If "summarize_data()" is run, all files will be summarized. 
+The code will save the generated dataframe in a database in "DATA" folder to be used later on easily.
+we can call this data using load("DATA/SumData.rda") command.
+
+If only certain files are needed, we can specify an index (as the file number) or a country code.
+For more details, go to the function documentation.
