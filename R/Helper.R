@@ -96,8 +96,8 @@ compute_headcounts <- function(
     Fisk_scale = NULL,
     Fisk_shape  = NULL,
     LN_sigma   = NULL,
-    NP_alpha   = NULL,
-    NP_beta    = NULL
+    NP_shape   = NULL,
+    NP_scale    = NULL
 ) {
 
   # --- Normalize and validate models input ---
@@ -113,7 +113,7 @@ compute_headcounts <- function(
   # Prepare result container:
   HC <- data.frame(
     Observed = PL_vals$obs,
-    row.names = PL_vals$pl
+    row.names = PL_vals$ratio
   )
 
   # --------------------------------------------------------
@@ -148,13 +148,13 @@ compute_headcounts <- function(
   # New Pareto headcounts
   # --------------------------------------------------------
   if ("np" %in% models) {
-    if (is.null(NP_alpha) || is.null(NP_beta)) {
-      stop("NP parameters (NP_alpha, NP_beta) must be provided when models include 'NP'.")
+    if (is.null(NP_shape) || is.null(NP_scale)) {
+      stop("NP parameters (NP_shape, NP_scale) must be provided when models include 'NP'.")
     }
 
     HC$NP_H <- sapply(
       PL_vals$pl,
-      function(p) CDF_NP(alpha = NP_alpha, beta = NP_beta, q = p) * 100
+      function(p) CDF_NP(shape = NP_shape, scale = NP_scale, q = p) * 100
     )
   }
 
@@ -209,19 +209,19 @@ compute_headcounts <- function(
 compute_param_summary <- function(
     Fisk_scale, Fisk_shape,
     LN_mu, LN_sigma,
-    NP_alpha, NP_beta,
-    se_Fisk_alpha = NA, se_Fisk_beta = NA,
+    NP_shape, NP_scale,
+    se_Fisk_scale = NA, se_Fisk_shape = NA,
     se_LN_mu = NA, se_LN_sigma = NA,
-    se_NP_alpha = NA, se_NP_beta = NA
+    se_NP_shape = NA, se_NP_scale = NA
 ) {
   data.frame(
-    Parameter = c("alpha / μ", "beta / σ"),
-    Fisk     = c(Fisk_scale, Fisk_shape),
-    Fisk_SE  = c(se_Fisk_alpha, se_Fisk_beta),
+    Parameter = c("shape/μ", "scale/σ"),
+    Fisk     = c(Fisk_shape, Fisk_scale),
+    Fisk_SE  = c(se_Fisk_shape, se_Fisk_scale),
     LN       = c(LN_mu, LN_sigma),
     LN_SE    = c(se_LN_mu, se_LN_sigma),
-    NP       = c(NP_alpha, NP_beta),
-    NP_SE    = c(se_NP_alpha, se_NP_beta),
+    NP       = c(NP_shape, NP_scale),
+    NP_SE    = c(se_NP_shape, se_NP_scale),
     row.names = NULL
   )
 }
@@ -302,3 +302,97 @@ conf_bound <- function(x, se, significance = 0.95) {
   return(data.frame(lower = lower, upper = upper))
 }
 
+#### Helper: Numeric derivative helper (centered difference) ------------
+num_deriv <- function(f, x, idx = 1, eps = 1e-6, ...) {
+  # f: function taking numeric vector x (or scalar), returns numeric scalar
+  # idx: index of x to perturb (for scalar x idx=1)
+  x <- as.numeric(x)
+  e <- eps
+  x_plus  <- x
+  x_minus <- x
+  x_plus[idx]  <- x_plus[idx]  + e
+  x_minus[idx] <- x_minus[idx] - e
+  (f(x_plus, ...) - f(x_minus, ...)) / (2*e)
+}
+
+### Get observed Headcount ---------------
+get_observed_HC <- function(data, Country) {
+
+  # extract CI_lower_XX and CI_upper_XX
+  hc_cols <- grep("^HC_", names(data), value = TRUE)
+  hc_cols <- hc_cols[!grepl("SE", hc_cols)]  # remove HC_SE_*
+
+  # extract thresholds
+  thresholds <- as.integer(gsub("HC_", "", hc_cols))
+
+  tibble::tibble(
+    threshold = thresholds,
+    observed_HC = as.numeric(data[data$Country == Country,hc_cols])
+  )
+}
+
+### Get observed Deciles/PErcentiles ---------------
+get_observed_deciles <- function(data, Country, Percentile = FALSE) {
+
+  # extract CI_lower_XX and CI_upper_XX
+  dec_cols <- grep("^d", names(data), value = FALSE)
+  if(Percentile){
+    dec_cols <- grep("^p", names(data), value = FALSE)
+  }
+
+return(data[data$Country==Country, dec_cols])
+}
+
+### LayerII
+
+compute_headcounts2 <- function(Country, data, L_nonCum, mean_y, Gini, N, PL_vals) {
+
+  observed <- get_observed_HC(data, Country)  # threshold + observed_HC
+  thresholds <- observed$threshold
+
+  results <- list()
+
+  for (model in names(CDF_registry)) {
+
+    fit <- fit_model(model, L_nonCum, mean_y, Gini, N)
+    if (!fit$ok) next
+
+    cdffun <- get(dist_registry[[model]]$cdffun)
+
+    H_model <- 100 * cdffun(PL_vals$pl, as.list(fit$par))
+
+    results[[model]] <- tibble::tibble(
+      Country = Country,
+      threshold = thresholds,
+      model = model,
+      model_H = H_model
+    )
+  }
+
+  # combine model output
+  model_df <- dplyr::bind_rows(results)
+
+  # merge observed HC
+  final_df <- model_df %>%
+    dplyr::left_join(observed, by = "threshold") %>%
+    dplyr::select(Country, threshold, observed_HC, model, model_H)
+
+  final_df
+}
+
+
+
+compute_param_summary2 <- function(Param, model, par, se) {
+
+# Add estimates
+est_col  <- paste0(model)
+Param[, est_col] <- NA
+Param[match(names(par), Param$Parameter), est_col] <- par
+
+# Add standard errors
+se_col <- paste0(model, "_SE")
+Param[, se_col] <- NA
+Param[match(names(se), Param$Parameter), se_col] <- se
+
+Param
+}
