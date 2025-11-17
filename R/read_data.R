@@ -103,5 +103,8 @@ read_data <- function(indices = NA,
     results[[j]] <- microdata
   }
 
+  if( j==1) {message("Done Reading: ", j, "file")}
+   else {message("Done Reading: ", j, "files")}
+
   return(results)
 }
