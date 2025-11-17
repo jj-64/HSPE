@@ -69,8 +69,18 @@ summarize_data <- function(indices = NA,
     HC <- sapply(PL_values, function(pl) mean(y < pl))
     SE_HC <- sqrt(HC * (1 - HC) / N)
 
+    ## Confidence iterval constrained between 0 and 1
+    CI_HC <- conf_bound(HC, SE_HC, significance = 0.95)
+    CI_HC$lower <- pmax(CI_HC$lower, 0)
+    CI_HC$upper <- pmin(CI_HC$upper, 1)
+
     names(HC) <- paste0("HC_", pov_lines * 100)
     names(SE_HC) <- paste0("HC_SE_", pov_lines * 100)
+    CI_vec <- c(CI_HC$lower, CI_HC$upper)
+    names(CI_vec) <- c(
+      paste0("CI_lower_", pov_lines * 100),
+      paste0("CI_upper_", pov_lines * 100)
+    )
 
     # ---- 6. Country name extracted from file name ----
     country <- sub("\\.dta$", "", nm)
@@ -85,7 +95,8 @@ summarize_data <- function(indices = NA,
       Gini_SE = Gini_se,
       qs,
       HC,
-      SE_HC
+      SE_HC,
+      CI_HC
     )
   }
 
