@@ -1,16 +1,19 @@
 #install.packages("hypergeo")
 library(hypergeo)
 library(nloptr)
-# Estimate alpha via optimization ---------------
-alpha_NP = function(Gini){
+
+## alpha is shape
+## beta is scale
+## Estimate shape via optimization ---------------
+shape_NP = function(Gini){
   ## Objective function
-  eval_f0 <- function( alpha,a,b){
-    return(abs(Gini_NP(alpha[1]) - Gini))
+  eval_f0 <- function( shape,a,b){
+    return(abs(Gini_NP(shape[1]) - Gini))
   }
 
   # constraint function g(x) <=0
-  eval_g0 <- function(alpha, a,b) {
-    return(b- a*alpha[1] )
+  eval_g0 <- function(shape, a,b) {
+    return(b- a*shape[1] )
   }
 
   # define parameters
@@ -31,32 +34,32 @@ alpha_NP = function(Gini){
   return(res1$solution)
 }
 
-# Wrapper for alpha as function of G (so derivative uses numeric differentiation)
-alpha_func_wrapper <- function(Gini) {
-  # call your alpha_NP implementation; return scalar numeric
-  # add tryCatch because alpha_NP uses optimizer and may fail
+# Wrapper for shape as function of G (so derivative uses numeric differentiation)
+shape_NP_func_wrapper <- function(Gini) {
+  # call your shape_NP implementation; return scalar numeric
+  # add tryCatch because shape_NP uses optimizer and may fail
   res <- tryCatch({
-    as.numeric(alpha_NP(Gini))
+    as.numeric(shape_NP(Gini))
   }, error = function(e) NA_real_)
   res
 }
 
-# Numerical derivative for α(G) ------------------
-alpha_NP_deriv <- function(Gini){
+## Numerical derivative for α(G) ------------------
+shape_NP_deriv <- function(Gini){
   eps <- 1e-6
-  (alpha_NP(Gini + eps) - alpha_NP(Gini - eps)) / (2 * eps)
+  (shape_NP(Gini + eps) - shape_NP(Gini - eps)) / (2 * eps)
 }
 
-#Estimating beta from alpha and mean by Optimization -------------
-beta_NP = function(mean_y , alpha){
+## Estimate scale from shape and mean by Optimization -------------
+scale_NP = function(mean_y , shape){
   ## Objective function
-  eval_f0 <- function( beta,a,b){
-    return( abs((2*alpha *beta *Re(hypergeo(2,2-((1+alpha)/alpha),3-((1+alpha)/alpha),-1))/(alpha - 1)) - mean_y ) )
+  eval_f0 <- function( scale,a,b){
+    return( abs((2*shape *scale *Re(hypergeo(2,2-((1+shape)/shape),3-((1+shape)/shape),-1))/(shape - 1)) - mean_y ) )
   }
 
   # constraint function g(x) <=0
-  eval_g0 <- function(beta, a,b) {
-    return(b- a*beta[1] )
+  eval_g0 <- function(scale, a,b) {
+    return(b- a*scale[1] )
   }
 
   # define parameters
@@ -77,17 +80,17 @@ beta_NP = function(mean_y , alpha){
   return(res1$solution)
 }
 
-# Wrapper for beta as function of (mean_y, alpha)
-beta_func_wrapper <- function(x) {
-  # x is numeric vector: c(mean_y, alpha)
-  mean_y <- x[1]; alpha <- x[2]
+# Wrapper for scale as function of (mean_y, shape)
+scale_NP_func_wrapper <- function(x) {
+  # x is numeric vector: c(mean_y, shape)
+  mean_y <- x[1]; shape <- x[2]
   res <- tryCatch({
-    as.numeric(beta_NP(mean_y, alpha))
+    as.numeric(scale_NP(mean_y, shape))
   }, error = function(e) NA_real_)
   res
 }
 
-## Standard error for alpha --------------------------
+## Standard error for shape --------------------------
 # Delta-method function
 # mean_y: sample mean
 # Gini: sample Gini
@@ -95,22 +98,22 @@ beta_func_wrapper <- function(x) {
 # se_Gini: SE(sample Gini)
 # cov_mean_gini: optional covariance between mean and gini (default 0)
 # eps: finite-diff step
-se_alpha_NP <- function(mean_y, Gini, se_mean, se_Gini, alpha =NA,
-                        cov_mean_gini = 0, eps = 1e-6) {
-  # 1) alpha and its derivative w.r.t Gini
-  if(is.na(alpha)) alpha <- alpha_func_wrapper(Gini)
-  if (is.na(alpha)) stop("alpha_NP returned NA or failed at provided Gini")
+se_shape_NP <- function(Gini, se_Gini, shape =NA, eps = 1e-6) {
 
-  d_alpha_dG <- num_deriv(function(G) alpha_func_wrapper(G), Gini, eps = eps)
+  # 1) shape (alpha) and its derivative w.r.t Gini
+  if(is.na(shape)) shape <- shape_NP_func_wrapper(Gini)
+  if (is.na(shape)) stop("shape_NP returned NA or failed at provided Gini")
 
-  var_alpha <- (d_alpha_dG^2) * (se_Gini^2)
-  se_alpha  <- sqrt(var_alpha)
+  d_shape_dG <- num_deriv(function(G) shape_NP_func_wrapper(G), Gini, eps = eps)
 
-  return(se_alpha)
+  var_shape <- (d_shape_dG^2) * (se_Gini^2)
+  se_shape  <- sqrt(var_shape)
+
+  return(se_shape)
 
 }
 
-## Standard error for beta --------------------------
+## Standard error for scale --------------------------
 # Delta-method function
 # mean_y: sample mean
 # Gini: sample Gini
@@ -118,104 +121,69 @@ se_alpha_NP <- function(mean_y, Gini, se_mean, se_Gini, alpha =NA,
 # se_Gini: SE(sample Gini)
 # cov_mean_gini: optional covariance between mean and gini (default 0)
 # eps: finite-diff step
-se_beta_NP <- function(mean_y, Gini, se_mean, se_Gini, alpha=NA, beta= NA,
+se_scale_NP <- function(mean_y, Gini, se_mean, se_Gini, shape=NA, se_shape = NA, scale= NA,
                        cov_mean_gini = 0, eps = 1e-6) {
-  # 1) alpha and its derivative w.r.t Gini
-  if(is.na(alpha)) alpha <- alpha_func_wrapper(Gini)
-  if (is.na(alpha)) stop("alpha_NP returned NA or failed at provided Gini")
+  # 1) shape and its derivative w.r.t Gini
+  if(is.na(shape)) shape <- shape_NP_func_wrapper(Gini)
+  if (is.na(shape)) stop("shape_NP returned NA or failed at provided Gini")
+  if(is.na(se_shape)) se_shape_NP(Gini, se_Gini, shape, eps= eps)
 
-  d_alpha_dG <- num_deriv(function(G) alpha_func_wrapper(G), Gini, eps = eps)
+  d_shape_dG <- num_deriv(function(G) shape_NP_func_wrapper(G), Gini, eps = eps)
 
-  var_alpha <- (d_alpha_dG^2) * (se_Gini^2)
-  se_alpha  <- sqrt(var_alpha)
-
-  # 2) beta and partial derivatives wrt mean_y and alpha
-  if(is.na(beta)) beta <- beta_func_wrapper(c(mean_y, alpha))
-  if (is.na(beta)) stop("beta_NP returned NA or failed at provided mean_y & alpha")
+  # 2) scale and partial derivatives wrt mean_y and shape
+  if(is.na(scale)) scale <- scale_NP_func_wrapper(c(mean_y, shape))
+  if (is.na(scale)) stop("scale_NP returned NA or failed at provided mean_y & shape")
 
   # partial derivative wrt mean_y
-  d_beta_dMean  <- num_deriv(function(x) beta_func_wrapper(c(x, alpha)), mean_y, eps = eps)
-  # partial derivative wrt alpha (hold mean_y fixed)
-  d_beta_dAlpha <- num_deriv(function(a) beta_func_wrapper(c(mean_y, a)), alpha, eps = eps)
+  d_scale_dMean  <- num_deriv(function(x) scale_NP_func_wrapper(c(x, shape)), mean_y, eps = eps)
+  # partial derivative wrt shape (hold mean_y fixed)
+  d_scale_dAlpha <- num_deriv(function(a) scale_NP_func_wrapper(c(mean_y, a)), shape, eps = eps)
 
-  # variance/covariance matrix of (mean_y, alpha)
+  # variance/covariance matrix of (mean_y, shape)
   var_mean  <- se_mean^2
-  var_alpha <- var_alpha
-  cov_ma    <- cov_mean_gini * d_alpha_dG  # if you provided Cov(mean, Gini), transform to cov(mean,alpha)
-  # Explanation: cov(mean, alpha) ≈ (d alpha / dG) * cov(mean, G)
-  # If user provided cov_mean_gini already as Cov(mean,alpha), then they should pass that value.
-  # We'll accept both: if cov_mean_gini is small relative to var_mean & var_alpha, it's effectively 0.
+  var_shape <- se_shape^2
+  cov_ma    <- cov_mean_gini * d_shape_dG  # if you provided Cov(mean, Gini), transform to cov(mean,shape)
+  # Explanation: cov(mean, shape) ≈ (d shape / dG) * cov(mean, G)
+  # If user provided cov_mean_gini already as Cov(mean,shape), then they should pass that value.
+  # We'll accept both: if cov_mean_gini is small relative to var_mean & var_shape, it's effectively 0.
 
-  # If user probably passed Cov(mean,Gini), cov_ma computed above; otherwise assume they passed cov(mean,alpha)
+  # If user probably passed Cov(mean,Gini), cov_ma computed above; otherwise assume they passed cov(mean,shape)
   # We'll check a heuristic: if cov_mean_gini magnitude is > 1e-8 and seems like Cov(mean,Gini) (rare),
-  # still use transformation. If user passed cov(mean,alpha) directly, they can pass cov_mean_gini already transformed.
+  # still use transformation. If user passed cov(mean,shape) directly, they can pass cov_mean_gini already transformed.
 
   # Build gradient and covariance
-  grad <- c(d_beta_dMean, d_beta_dAlpha)
-  Sigma <- matrix(c(var_mean, cov_ma, cov_ma, var_alpha), nrow = 2)
+  grad <- c(d_scale_dMean, d_scale_dAlpha)
+  Sigma <- matrix(c(var_mean, cov_ma, cov_ma, var_shape), nrow = 2)
 
-  var_beta <- as.numeric(t(grad) %*% Sigma %*% grad)
-  se_beta  <- sqrt(max(0, var_beta))
+  var_scale <- as.numeric(t(grad) %*% Sigma %*% grad)
+  se_scale  <- sqrt(max(0, var_scale))
 
-  return(se_beta)
+  return(se_scale)
 }
+
 ## Function for the Lorenz Curve for the country -------------
-Lorenz_NP = function(y, alpha, beta) { ## the income group y, alpha and beta of the NPareto, mean income
+Lorenz_NP_fromY = function(y, shape, scale) { ## the income group y, shape and scale of the NPareto, mean income
 
   ## vector for the intergrals
 
-  integrand <- function(z) {z * pdf_NP(alpha, beta, z) }
+  integrand <- function(z) {z * pdf_NP(shape, scale, z) }
   int= c()
-  for(i in seq_along(y)) int[i] = integrate(integrand, lower = beta, upper = y[i])$value
+  for(i in seq_along(y)) int[i] = integrate(integrand, lower = scale, upper = y[i])$value
 
   ## Formula
   Lorenz = 1/mean(y) * int
   return(Lorenz)
 }
 
-## Quantile function to build Lorenz curve, returns the percentile ------------
-Percentile_NP = function(alpha, q) {
+Lorenz_NP <- function(p = seq(0.1, 1, by =0.1), shape){
 
-  doubleInt <- function(q,alpha){
-    f <- function(t,alpha){((1+t)/(1-t))^(1/alpha)}
-    fvalue = c()
-    for (i in seq_along(q)) fvalue[i] <- integrate(f,lower=0,upper=q[i],alpha=alpha)$value
+  doubleInt <- function(p,shape){
+    f <- function(t,shape){((1+t)/(1-t))^(1/shape)}
+    fvalue <- integrate(f,lower=0,upper=p,shape=shape)$value
     return(fvalue)
   }
 
-  return ( doubleInt(q,alpha)/  Re(alpha * hypergeo::hypergeo(1,-1/alpha,2-1/alpha,-1) / (alpha-1) ) )
-
-}
-
-## pdf of NewPareto --------------------
-pdf_NP = function(alpha,beta,p) {
-  return(ifelse(p>= beta, (2 * alpha * beta^alpha *p^(alpha-1) ) / (p^alpha + beta^alpha)^2 ,0))
-}
-
-## Function 10:  CDF of NewPareto ----------------
-CDF_NP = function(alpha,beta,q) {
-  return(ifelse(q>= beta, (q^alpha - beta^alpha) / (q^alpha + beta^alpha),0))
-}
-
-## Quantile Function from percentiles ------------------
-Quantile_NP = function(alpha,beta,p) {
-  return(ifelse(p<1,beta* ((-p-1)/(p-1))^(1/alpha),100000000))
-}
-
-## Radom Generated NP ----------------------
-#NP distributed x: Given a uniform variate U drawn from U(0, 1) distribution, we obtain X, which is NP distributed and is given by
-random_NP <- function (u,a,b){(((2*(b^a))/u)-(b^a))^(1/a)}
-
-## Compute the Gini from NP distribution ------------------
-Gini_NP <- function(alpha){
-
-  doubleInt <- function(p,alpha){
-    f <- function(t,alpha){((1+t)/(1-t))^(1/alpha)}
-    fvalue <- integrate(f,lower=0,upper=p,alpha=alpha)$value
-    return(fvalue)
-  }
-
-  integrationTrap <- function (func, lower, upper, alpha){
+  integrationTrap <- function (func, lower, upper, shape){
     x = seq(lower,upper,by=0.001)  ## divide the x-axis into small intervals
     n = length(x)
     x <- as.matrix(x,n,1)
@@ -225,7 +193,7 @@ Gini_NP <- function(alpha){
 
     for(i in 1:n)
     {
-      Y[i] <- func(x[i],alpha)  ## the integral over evey portion/interval
+      Y[i] <- func(x[i],shape)  ## the integral over evey portion/interval
     }
 
     tra[1] <- 0
@@ -235,20 +203,98 @@ Gini_NP <- function(alpha){
   }
 
   ## Gini integral
-  integ = integrationTrap(func=doubleInt,lower=0, upper = 1, alpha=alpha)/Re(alpha * hypergeo(1,-1/alpha,2-1/alpha,-1) / (alpha-1) )
+  denominator = Re(shape * hypergeo(1,-1/shape,2-1/shape,-1) / (shape-1) )
+
+  L = sapply(p, FUN = function(p) integrationTrap(func=doubleInt,lower=0, upper = p, shape=shape))
+
+  return(L/denominator)
+  }
+
+## Quantile function to build Lorenz curve, returns the percentile ------------
+Percentile_NP = function(shape, q) {
+
+  doubleInt <- function(q,shape){
+    f <- function(t,shape){((1+t)/(1-t))^(1/shape)}
+    fvalue = c()
+    for (i in seq_along(q)) fvalue[i] <- integrate(f,lower=0,upper=q[i],shape=shape)$value
+    return(fvalue)
+  }
+
+  return ( doubleInt(q,shape)/  Re(shape * hypergeo::hypergeo(1,-1/shape,2-1/shape,-1) / (shape-1) ) )
+
+}
+
+## pdf of NewPareto --------------------
+pdf_NP = function(shape,scale,p) {
+  return(ifelse(p>= scale, (2 * shape * scale^shape *p^(shape-1) ) / (p^shape + scale^shape)^2 ,0))
+}
+
+## CDF of NewPareto ----------------
+CDF_NP = function(shape,scale,q) {
+  #return(ifelse(q>= scale, (q^shape - scale^shape) / (q^shape + scale^shape),0))
+  return(ifelse(q>= scale, 1 -2 / ( 1+(q/scale)^shape),0))
+}
+
+## Quantile Function from percentiles ------------------
+Quantile_NP = function(shape,scale,p) {
+  #return(ifelse(p<1, scale * ((-p-1)/(p-1))^(1/shape),100000000))
+  scale * ((2/(1-p) - 1)^(1/shape))
+}
+
+## Radom Generated NP ----------------------
+#NP distributed x: Given a uniform variate U drawn from U(0, 1) distribution, we obtain X, which is NP distributed and is given by
+random_NP <- function (u,a,b){(((2*(b^a))/u)-(b^a))^(1/a)}
+
+## Gini from NP distribution ------------------
+Gini_NP <- function(shape){
+
+  # doubleInt <- function(p,shape){
+  #   f <- function(t,shape){((1+t)/(1-t))^(1/shape)}
+  #   fvalue <- integrate(f,lower=0,upper=p,shape=shape)$value
+  #   return(fvalue)
+  # }
+  #
+  # integrationTrap <- function (func, lower, upper, shape){
+  #   x = seq(lower,upper,by=0.001)  ## divide the x-axis into small intervals
+  #   n = length(x)
+  #   x <- as.matrix(x,n,1)
+  #   Y <- matrix(0,n,1)
+  #   Y <- as.matrix(Y,n,1)
+  #   tra <- matrix(0,n,1)
+  #
+  #   for(i in 1:n)
+  #   {
+  #     Y[i] <- func(x[i],shape)  ## the integral over evey portion/interval
+  #   }
+  #
+  #   tra[1] <- 0
+  #   for (i in 2:n) {
+  #     tra[i] <-((0.5)*(x[i]-x[i-1])*(Y[i]+Y[i-1]))  }
+  #   return(sum(tra))
+  # }
+  #
+  # ## Gini integral
+  # integ = integrationTrap(func=doubleInt,lower=0, upper = 1, shape=shape)/Re(shape * hypergeo(1,-1/shape,2-1/shape,-1) / (shape-1) )
+
+  integ = Lorenz_NP(p=1, shape= shape)
   gini <- 1- 2*integ
 
   ## Return
   return(gini)
 }
 
-##MLE estimate -----------------------------------
-#Code from paper for maximum likelihood, returns alpha and beta estimates
-functionMLE_NP <- function(z){                 ## Code from paper for maximum likelihood, returns alpha and beta estimates
+## Mean from NP distribution -----------------
+mean_NP <- function(shape, scale){
+  2*shape *scale *Re(hypergeo(2,2-((1+shape)/shape),3-((1+shape)/shape),-1))/(shape - 1)
+}
+
+## MLE estimate -----------------------------------
+#Code from paper for maximum likelihood, returns shape and scale estimates
+functionMLE_NP <- function(z){                 ## Code from paper for maximum likelihood, returns shape and scale estimates
   z <- sort(z)
   x <- z[2:length(z)]
   b <- min(z)
-  alphaguess <- length(z)/sum(log(z)-log(b))
+  shapeguess <- length(z)/sum(log(z)-log(b))
 
   g<- function(a,b,x=x){
     res <- -2*sum(((b/x)^a*log(b/x))/((b/x)^a + 1 )) + sum(log(b/x)) + length(x)/a
@@ -262,7 +308,7 @@ functionMLE_NP <- function(z){                 ## Code from paper for maximum li
     return(b1)
   }
 
-  mm  <- alphaguess
+  mm  <- shapeguess
   tol <- 1e-8
   val <- 5
   xn  <- mm
@@ -278,10 +324,10 @@ functionMLE_NP <- function(z){                 ## Code from paper for maximum li
 
   minimum <- min(z)
   converge <-c("FALSE")
-  alphaResult <- res
-  betaResult <- b
-  results <- list(alphaEstimate = alphaResult,
-                  betaEstimate = betaResult)
+  shapeResult <- res
+  scaleResult <- b
+  results <- list(shapeEstimate = shapeResult,
+                  scaleEstimate = scaleResult)
   return(results)
 }
 
@@ -298,7 +344,7 @@ functionMLE_NP <- function(z){                 ## Code from paper for maximum li
 # for (i in 1:num_new_values) {
 #   u <- runif(1)  ## Generate a uniform random number
 #   y <- min_value + u * (max_value - min_value)
-#   while (runif(1) > Fy_NPareto(estimated_params$alphaEstimate, estimated_params$betaEstimate, y)) {
+#   while (runif(1) > Fy_NPareto(estimated_params$shapeEstimate, estimated_params$scaleEstimate, y)) {
 #     u <- runif(1)
 #     y <- min_value + u * (max_value - min_value)
 #   }
@@ -308,7 +354,7 @@ functionMLE_NP <- function(z){                 ## Code from paper for maximum li
 
 ### Method 2 of estimating micro data ####
 #
-# new_values1 <- random_NP(runif(fyy2), estimated_params$alphaEstimate, estimated_params$betaEstimate)
+# new_values1 <- random_NP(runif(fyy2), estimated_params$shapeEstimate, estimated_params$scaleEstimate)
 #
 # sorted_new_values <- sort(new_values)
 # sorted_new_values1 <- sort(new_values1)
@@ -316,20 +362,7 @@ functionMLE_NP <- function(z){                 ## Code from paper for maximum li
 # df <- data.frame(DataVector = sorted_new_values, NewValues = sorted_new_values1)
 
 
-# Requires: nloptr (for your existing alpha_NP / beta_NP), stats
-
-# Numeric derivative helper (centered difference)
-num_deriv <- function(f, x, idx = 1, eps = 1e-6, ...) {
-  # f: function taking numeric vector x (or scalar), returns numeric scalar
-  # idx: index of x to perturb (for scalar x idx=1)
-  x <- as.numeric(x)
-  e <- eps
-  x_plus  <- x
-  x_minus <- x
-  x_plus[idx]  <- x_plus[idx]  + e
-  x_minus[idx] <- x_minus[idx] - e
-  (f(x_plus, ...) - f(x_minus, ...)) / (2*e)
-}
+# Requires: nloptr (for your existing shape_NP / scale_NP), stats
 
 
 # ---------------------------
@@ -338,13 +371,13 @@ num_deriv <- function(f, x, idx = 1, eps = 1e-6, ...) {
 # incomes: numeric vector of person-level incomes (or unit-level)
 # R: number of bootstrap resamples (e.g., 1000)
 # parallel: "no" or use multicore? (not implemented here)
-se_newpareto_boot <- function(incomes, R = 1000, seed = 1234, alpha_init = NULL) {
+se_newpareto_boot <- function(incomes, R = 1000, seed = 1234, shape_init = NULL) {
   set.seed(seed)
   n <- length(incomes)
 
   # storage
-  alpha_bs <- numeric(R)
-  beta_bs  <- numeric(R)
+  shape_bs <- numeric(R)
+  scale_bs  <- numeric(R)
   mean_bs  <- numeric(R)
   gini_bs  <- numeric(R)
 
@@ -368,53 +401,71 @@ se_newpareto_boot <- function(incomes, R = 1000, seed = 1234, alpha_init = NULL)
     m_hat <- mean(samp)
     g_hat <- compute_gini(samp)
 
-    # try alpha and beta; wrap in tryCatch
-    al <- tryCatch(alpha_NP(g_hat), error = function(e) NA_real_)
+    # try shape and scale; wrap in tryCatch
+    al <- tryCatch(shape_NP(g_hat), error = function(e) NA_real_)
     be <- NA_real_
     if (!is.na(al)) {
-      be <- tryCatch(beta_NP(m_hat, al), error = function(e) NA_real_)
+      be <- tryCatch(scale_NP(m_hat, al), error = function(e) NA_real_)
     }
 
     mean_bs[r] <- m_hat
     gini_bs[r] <- g_hat
-    alpha_bs[r] <- al
-    beta_bs[r]  <- be
+    shape_bs[r] <- al
+    scale_bs[r]  <- be
 
     setTxtProgressBar(pb, r)
   }
   close(pb)
 
   # Remove failed iterations
-  ok <- is.finite(alpha_bs) & is.finite(beta_bs)
+  ok <- is.finite(shape_bs) & is.finite(scale_bs)
   if (sum(ok) < max(10, 0.1 * R)) {
-    warning("Many bootstrap iterations failed. Check alpha_NP / beta_NP stability.")
+    warning("Many bootstrap iterations failed. Check shape_NP / scale_NP stability.")
   }
 
-  alpha_bs <- alpha_bs[ok]
-  beta_bs  <- beta_bs[ok]
+  shape_bs <- shape_bs[ok]
+  scale_bs  <- scale_bs[ok]
   mean_bs  <- mean_bs[ok]
   gini_bs  <- gini_bs[ok]
 
   # Estimates
-  alpha <- mean(alpha_bs)
-  beta_hat  <- mean(beta_bs)
+  shape <- mean(shape_bs)
+  scale_hat  <- mean(scale_bs)
 
-  se_alpha <- sd(alpha_bs)
-  se_beta  <- sd(beta_bs)
+  se_shape <- sd(shape_bs)
+  se_scale  <- sd(scale_bs)
 
   cov_mean_gini <- cov(mean_bs, gini_bs)
-  cov_mean_alpha <- cov(mean_bs, alpha_bs)
-  cov_alpha_beta <- cov(alpha_bs, beta_bs)
+  cov_mean_shape <- cov(mean_bs, shape_bs)
+  cov_shape_scale <- cov(shape_bs, scale_bs)
 
   list(
-    alpha = alpha,
-    se_alpha = se_alpha,
-    beta_hat = beta_hat,
-    se_beta = se_beta,
+    shape = shape,
+    se_shape = se_shape,
+    scale_hat = scale_hat,
+    se_scale = se_scale,
     cov_mean_gini = cov_mean_gini,
-    cov_mean_alpha = cov_mean_alpha,
-    cov_alpha_beta = cov_alpha_beta,
-    raw = list(mean_bs = mean_bs, gini_bs = gini_bs, alpha_bs = alpha_bs, beta_bs = beta_bs)
+    cov_mean_shape = cov_mean_shape,
+    cov_shape_scale = cov_shape_scale,
+    raw = list(mean_bs = mean_bs, gini_bs = gini_bs, shape_bs = shape_bs, scale_bs = scale_bs)
   )
+}
+
+### Headcount SE ------------------
+HC_se_NP <- function(x, shape, scale, se_shape, se_scale, cov_shape_scale = 0) {
+
+  # compute u = (p/scale)^shape
+  u <- (x / scale)^shape
+
+  # HC derivative components
+  dH_da <- (1 + u)^(-2) * 2 * u * log(x / scale)  ## derivative w.r.t shape
+  dH_db <- (1 + u)^(-2) * 2* u * (-shape / scale) ## derivative w.r.t scale
+
+  # delta-method variance
+  var_H <- dH_db^2 * se_scale^2 +
+    dH_da^2 * se_shape^2 +
+    2 * dH_da * dH_db * cov_shape_scale
+
+  sqrt(var_H)  # return standard error
 }
 
