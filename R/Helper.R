@@ -62,9 +62,46 @@ replicate_rows_p <- function(df) {
 # -------------------------
 # Helper function: Confidence interval
 # -------------------------
-conf_bound <-function(x, se, significane = 0.95){
-  z= abs(qnorm((1-significane)/2))
-  lower = x - z*se
-  upper = x + z*se
-  return(lower=lower, upper=upper)
+#' Compute Confidence Bounds for Proportions or Estimates
+#'
+#' This function computes a two-sided (lower/upper) confidence interval
+#' for an estimate `x` given its standard error `se`. It supports vectorized
+#' inputs, meaning `x` and `se` can be numeric vectors of the same length.
+#'
+#' @param x Numeric vector. The point estimates.
+#' @param se Numeric vector. The standard errors associated with each estimate.
+#' @param significance Numeric value between 0 and 1 (default = 0.95).
+#'                     The confidence level.
+#'
+#' @return A data.frame with two columns:
+#'         - lower: lower confidence bound
+#'         - upper: upper confidence bound
+#'
+#' @examples
+#' conf_bound(0.5, 0.1)
+#' conf_bound(c(0.5, 0.7), c(0.1, 0.05))
+#'
+conf_bound <- function(x, se, significance = 0.95) {
+
+  # --- Input checks ---
+  if (!is.numeric(x) || !is.numeric(se)) {
+    stop("x and se must be numeric.")
+  }
+  if (length(x) != length(se)) {
+    stop("x and se must have the same length.")
+  }
+  if (significance <= 0 || significance >= 1) {
+    stop("significance must be between 0 and 1.")
+  }
+
+  # --- Compute z-value ---
+  z <- abs(qnorm((1 - significance) / 2))
+
+  # --- Confidence interval ---
+  lower <- x - z * se
+  upper <- x + z * se
+
+  # Return a clean data frame
+  return(data.frame(lower = lower, upper = upper))
 }
+
