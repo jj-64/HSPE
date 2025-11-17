@@ -14,7 +14,7 @@
 #'        Default = c(0.2, 0.5, 0.8).
 #'
 #' @return A data.frame of summary results, one row per dataset.
-#' @example
+#' @examples
 #' sum_data = summarize_data(country_filter = "at97")
 #' View(sum_data)
 #' @export
