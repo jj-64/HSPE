@@ -5,19 +5,19 @@ Sigma_LN<- function(Gini) {
 }
 
 ## Lognormal meanlog (mu) -------------
-mu_LN = function(mean_y, Sigma){
-  log(mean_y) - Sigma^2/2
+mu_LN = function(mean_y, LN_sigma){
+  log(mean_y) - LN_sigma^2/2
 }
 
 ## Standard Error for Sigma parameter ------------
 se_sigma_LN = function(mean_y, Gini, se_Gini){
 
-  sigma_LN = Sigma_LN(Gini)
-  mu_LN    <- mu_LN(mean_y, sigma_LN)
+  #LN_sigma = Sigma_LN(Gini)
+  #mu_LN    <- mu_LN(mean_y, LN_sigma)
 
   # Derivative dσ/dG
   z <- (1 + Gini) / 2
-  d_sigma_dG <- sqrt(2) * (1 / dnorm(qnorm(z))) * (1/2)
+  d_sigma_dG <- sqrt(2) * (1/dnorm(qnorm(z))) * (1/2)
 
   se_sigma_LN <- abs(d_sigma_dG) * se_Gini
   return(se_sigma_LN)
@@ -26,7 +26,7 @@ se_sigma_LN = function(mean_y, Gini, se_Gini){
 ## Standard error for mu parameter -----------------
 se_mu_LN = function(mean_y, Gini, se_mean, se_Gini){
 
-  sigma_LN = Sigma_LN(Gini)
+  LN_sigma = Sigma_LN(Gini)
 
   # Derivative dμ/dmean
   d_mu_dmean <- 1 / mean_y
@@ -36,7 +36,7 @@ se_mu_LN = function(mean_y, Gini, se_mean, se_Gini){
   d_sigma_dG <- sqrt(2) * (1 / dnorm(qnorm(z))) * (1/2)
 
   # Derivative dμ/dG = -sigma * dσ/dG
-  d_mu_dG <- -sigma_LN * d_sigma_dG
+  d_mu_dG <- -LN_sigma * d_sigma_dG
 
   se_mu_LN <- sqrt(
     (d_mu_dmean * se_mean)^2 +
@@ -46,45 +46,78 @@ se_mu_LN = function(mean_y, Gini, se_mean, se_Gini){
 }
 
 ## Compute the Lorenz Curve - Lopez ----------------
-Lorenz_LN = function(Sigma, P) {
+Lorenz_LN = function(LN_sigma, P) {
 
   Lorenz=0
   for(i in 1:length(P)) {
-    Lorenz[i] = pnorm(qnorm(P[i]) - Sigma)
+    Lorenz[i] = pnorm(qnorm(P[i]) - LN_sigma)
   }
   return(Lorenz)
 }
 
 ## PDF of Lognormal, same as dlnorm -----------
-pdf_LN = function(y,lmu,std) { ## lmu is mean in logscale
-  exp(-(log(y) - lmu )^2/( 2*std^2) ) / (y*std*sqrt(2*pi))
+pdf_LN = function(y,mu_LN,LN_sigma) { ## lmu is mean in logscale
+  exp(-(log(y) - mu_LN )^2/( 2*LN_sigma^2) ) / (y*LN_sigma*sqrt(2*pi))
+}
+
+## CDF of Lognormal, same as plnorm ------------
+CDF_LN = function(y, mean_y, LN_sigma){
+  #pnorm((log(y) - mu_LN)/LN_sigma)
+  pnorm( (log(y / mean_y) / LN_sigma) + LN_sigma / 2 )
 }
 
 ## Function for the Lorenz Curve for the country --------------
-Lorenz_LN = function(y, mu, Sigma) { ## the income group y, mean income and sigma
+Lorenz_LN = function(y, mu_LN, LN_sigma) { ## the income group y, mean income and sigma
 
   ## vector for the intergrals
 
-  integrand <- function(z) {z * dlnorm(z, mu, Sigma) }
+  integrand <- function(z) {z * dlnorm(z, mu_LN, LN_sigma) }
   int = integrate(integrand, lower = 0, upper = y)$value
 
   ## Formula
-  Lorenz = exp(-(mu + Sigma^2/2)) * int
+  Lorenz = exp(-(mu_LN + LN_sigma^2/2)) * int
   return(Lorenz)
 }
 
 ## Function for the Lorenz Curve for the region ---------------
-R_Lorenz_LN = function(y, R_mu, popw, mu, sigma) { ## the income group y, regional mean income and vector of population weight, vector of mu, of sigma
+R_Lorenz_LN = function(y, R_mu, popw, mu_LN, sigma) { ## the income group y, regional mean income and vector of population weight, vector of mu_LN, of sigma
 
   ## vector for the intergrals
   int = 0
 
-  for( i in 1:length(mu)) {
-    integrand <- function(z) {z * dlnorm(z, mu[i], sigma[i]) }
+  for( i in 1:length(mu_LN)) {
+    integrand <- function(z) {z * dlnorm(z, mu_LN[i], sigma[i]) }
     int[i] = integrate(integrand, lower = 0, upper = y)$value
   }
 
   ## Formula
   Lorenz = (1/R_mu) * sum (popw * int)
   return(Lorenz)
+}
+
+## Headcount Standard Error ---------------
+HC_se_LN <- function(p, mean_y, LN_sigma, se_mean, se_sigma, se_mu, cov_mu_sigma = 0) {
+
+  #LN_loc = mu_LN(mean_y, LN_sigma)
+
+  # compute z value
+  z <- (log(p / mean_y) / LN_sigma) + LN_sigma / 2
+
+  # normal pdf
+  phi_z <- dnorm(z)
+
+  # derivatives
+  dH_dmean    <- phi_z * (-1 / (mean_y * LN_sigma))
+  dH_dsigma <- phi_z * ( -log(p / mean_y) / (LN_sigma^2) + 0.5 )
+  #dH_dmu <- phi_z * (-1 / (mean_y * LN_sigma)) * exp(LN_sigma^2/2 + LN_loc)
+
+  # delta-method variance
+  var_H <- (dH_dmean^2)    * se_Average^2 +
+    (dH_dsigma^2) * se_sigma^2 +
+    2 * dH_dmean * dH_dsigma * cov_mu_sigma
+
+  # var_H <- (dH_dmu^2)    * se_mu^2 +
+  #   (dH_dsigma^2) * se_sigma^2 +
+  #   2 * dH_dmean * dH_dsigma * cov_mu_sigma
+  sqrt(var_H)  # return SE
 }
