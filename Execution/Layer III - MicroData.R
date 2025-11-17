@@ -25,7 +25,7 @@ summarize_data <- function(indices = NA,
 
     for(models in modelss){
       mlfit.gb2(fyy2)
-      fit_FISK <- fitdist(as.numeric(fyy2), "llogis", method = "mle", control = list(trace = 1))
+      fit_FISK <- fitdistrplus::fitdist(as.numeric(fyy2), "llogis", method = "mle", control = list(trace = 1))
 
       fit_LN <- fitdistr(fyy2, densfun = "lognormal")
 
