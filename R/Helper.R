@@ -58,3 +58,13 @@ replicate_rows_p <- function(df) {
     ungroup()
   return(as.data.frame(df))
 }
+
+# -------------------------
+# Helper function: Confidence interval
+# -------------------------
+conf_bound <-function(x, se, significane = 0.95){
+  z= abs(qnorm((1-significane)/2))
+  lower = x - z*se
+  upper = x + z*se
+  return(lower=lower, upper=upper)
+}
