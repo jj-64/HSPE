@@ -34,6 +34,7 @@ summarize_data <- function(indices = NA,
 
   out <- list()
 
+
   for (nm in names(data_list)) {
     df <- data_list[[nm]]
 
@@ -96,7 +97,7 @@ summarize_data <- function(indices = NA,
       qs,
       HC,
       SE_HC,
-      CI_HC
+      CI_vec
     )
   }
 
