@@ -19,7 +19,7 @@
 #'   }
 #' @export
 #' @examples
-#' res = estimate_param(dist = "NP", mean_y = 6000, Gini = 0.36, se_mean = 250, se_Gini = 0.01)
+#' res = fit_model_limited(dist = "NP", mean_y = 6000, Gini = 0.36, se_mean = 250, se_Gini = 0.01)
 #' # res$NP
 #' # $par
 #' # shape       scale
@@ -30,7 +30,7 @@
 #' # 0.04810901 125.06197149
 #'
 #'
-#' res = estimate_param(dist = c("LN","NP"), mean_y = 6000, Gini = 0.36, se_mean = 250, se_Gini = 0.01)
+#' res = fit_model_limited(dist = c("LN","NP"), mean_y = 6000, Gini = 0.36, se_mean = 250, se_Gini = 0.01)
 #' # $FISK
 #' # [1] NA
 #' #
@@ -52,7 +52,7 @@
 #' # $NP$se
 #' # se_shape se_scale
 #' # 0.04810901 125.06197149
-estimate_param <- function(dist = c("LN", "NP", "FISK"), mean_y, Gini, se_mean = NA, se_Gini = NA){
+fit_model_limited <- function(dist = c("LN", "NP", "FISK"), mean_y, Gini, se_mean = NA, se_Gini = NA){
   #dist <- match.arg(dist)
   #if(! (all(dist) %in% c("LN", "NP", "FISK"))) stop("dist should be one or multiple of LN, FISK, NP")
   results = list("FISK" = NA, "LN" =NA, "NP" = NA)
