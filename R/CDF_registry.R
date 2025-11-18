@@ -8,9 +8,9 @@ options(scipen = 999)
 
 # Helper: Compute CDF functions -----------------------------
 CDF_DA <- function(y, param){ (1 + (y / param$b)^(-param$a))^(-param$p) }
-CDF_SM <- function(y, param){ 1 - (1 + (y / param$b)^param$a)^(-param$Q) }
-CDF_B2 <- function(y, param){ pbeta(y/(param$b+y), param$p, param$Q) }
-CDF_GB2 <- function(y, param){ pbeta((y/param$b)^param$a/(1+(y/param$b)^param$a), param$p, param$Q) }
+CDF_SM <- function(y, param){ 1 - (1 + (y / param$b)^param$a)^(-param$q) }
+CDF_B2 <- function(y, param){ pbeta(y/(param$b+y), param$p, param$q) }
+CDF_GB2 <- function(y, param){ pbeta((y/param$b)^param$a/(1+(y/param$b)^param$a), param$p, param$q) }
 CDF_NP_param <- function(y, param) {ifelse(y >= param$scale, 1 - 2/(1 + (y/param$scale)^param$shape), 0) }
 CDF_FISK_param <- function(y, param){CDF_FISK(y=y, scale=param$b, shape= param$a)}
 CDF_LN_param <- function(y, param){CDF_LN(y=y, mean_y= exp(param$mu), s= param$s)}
@@ -36,13 +36,14 @@ CDF_registry <- list(
     fitfun = "fitgroup.sm",
     fitmicro = "",
     params  = c("a","b","q"),
-    cdffun  = "CDF_SM"
+    cdffun  = "CDF_SM",
+    HCsefun = "HC_SE_SM_param"
   ),
   B2 = list(
     fitfun = "fitgroup.b2",
     fitmicro = "beta2",
     params  = c("p","q","b"),
-    cdffun  = "CDF_B2"
+    cdffun  = "CDF_B2",
   ),
   GB2 = list(
     fitfun = "fitgroup.gb2",
