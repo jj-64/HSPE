@@ -11,7 +11,7 @@ CDF_DA <- function(y, param){ (1 + (y / param$b)^(-param$a))^(-param$p) }
 CDF_SM <- function(y, param){ 1 - (1 + (y / param$b)^param$a)^(-param$Q) }
 CDF_B2 <- function(y, param){ pbeta(y/(param$b+y), param$p, param$Q) }
 CDF_GB2 <- function(y, param){ pbeta((y/param$b)^param$a/(1+(y/param$b)^param$a), param$p, param$Q) }
-CDF_NP <- function(y, param) {ifelse(y >= param$b, 1 - 2/(1 + (y/param$b)^param$a), 0) }
+CDF_NP_param <- function(y, param) {ifelse(y >= param$scale, 1 - 2/(1 + (y/param$scale)^param$shape), 0) }
 
 # Helper: CDF Registry -----------------------------
 
@@ -53,10 +53,15 @@ CDF_registry <- list(
     cdffun  = "CDF_LN"
   ),
   NP = list(
-    fitfun = "fit_np",
+    fitfun = "fitgroup.np",
     fitmicro = "",
-    params = c("a", "b"),
-    cdffun = "CDF_NP"
+    params = c("shape", "scale"),
+    cdffun = "CDF_NP_param"
+  ),
+
+  Fisk2 <- list(
+    fitfun = "fit_Fisk",
+    params = c("shape", "scale")
   )
 
 )
