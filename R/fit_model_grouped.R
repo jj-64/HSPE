@@ -36,7 +36,8 @@ fit_model_grouped <- function(model = c("DA","SM","B2","GB2","FISK","LN","NP"),
                               L_nonCum,
                               mean_y,
                               Gini,
-                              N)
+                              N,
+                              nrep = 1000)
 {
   model <- match.arg(model)
 
@@ -57,7 +58,7 @@ fit_model_grouped <- function(model = c("DA","SM","B2","GB2","FISK","LN","NP"),
       N       = N,
       se.ewmd = TRUE,
       se.scale = TRUE,
-      nrep    = 100
+      nrep    = nrep
     )
 
     list(
