@@ -5,30 +5,30 @@
 \title{Summarize Estimated Distribution Parameters and Standard Errors}
 \usage{
 compute_param_summary(
-  Fisk_alpha,
-  Fisk_beta,
+  Fisk_scale,
+  Fisk_shape,
   LN_mu,
   LN_sigma,
-  NP_alpha,
-  NP_beta,
-  se_Fisk_alpha = NA,
-  se_Fisk_beta = NA,
+  NP_shape,
+  NP_scale,
+  se_Fisk_scale = NA,
+  se_Fisk_shape = NA,
   se_LN_mu = NA,
   se_LN_sigma = NA,
-  se_NP_alpha = NA,
-  se_NP_beta = NA
+  se_NP_shape = NA,
+  se_NP_scale = NA
 )
 }
 \arguments{
-\item{Fisk_alpha, Fisk_beta}{Numeric. Estimated parameters of the Fisk distribution.}
+\item{Fisk_scale, Fisk_shape}{Numeric. Estimated parameters of the Fisk distribution.}
 
 \item{LN_mu, LN_sigma}{Numeric. Estimated parameters of the Lognormal distribution.}
+
+\item{se_LN_mu, se_LN_sigma}{Numeric. Standard errors for Lognormal parameters.}
 
 \item{NP_alpha, NP_beta}{Numeric. Estimated parameters of the New Pareto distribution.}
 
 \item{se_Fisk_alpha, se_Fisk_beta}{Numeric. Standard errors for the Fisk parameters.}
-
-\item{se_LN_mu, se_LN_sigma}{Numeric. Standard errors for Lognormal parameters.}
 
 \item{se_NP_alpha, se_NP_beta}{Numeric. Standard errors for New Pareto parameters.
 All SEs default to \code{NA} if not provided.}
@@ -61,7 +61,7 @@ The function outputs a two-row table:
 }
 \examples{
 compute_param_summary(
-  Fisk_alpha = 2.1, Fisk_beta = 1.4,
+  Fisk_scale = 2.1, Fisk_shape = 1.4,
   LN_mu = 3.2, LN_sigma = 0.55,
   NP_alpha = 1.7, NP_beta = 0.9,
   se_Fisk_alpha = 0.05, se_Fisk_beta = 0.03

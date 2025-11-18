@@ -8,11 +8,11 @@ compute_headcounts(
   PL_vals,
   models = c("all", "LN", "FISK", "NP"),
   Average = NULL,
-  Fisk_alpha = NULL,
-  Fisk_beta = NULL,
+  Fisk_scale = NULL,
+  Fisk_shape = NULL,
   LN_sigma = NULL,
-  NP_alpha = NULL,
-  NP_beta = NULL
+  NP_shape = NULL,
+  NP_scale = NULL
 )
 }
 \arguments{
@@ -30,7 +30,7 @@ The matching is case-insensitive.}
 \item{Average}{Numeric. Mean income parameter required for the
 Lognormal (LN) model.}
 
-\item{Fisk_alpha, Fisk_beta}{Numerics. Shape parameters for the
+\item{Fisk_scale, Fisk_shape}{Numerics. Shape parameters for the
 Fisk distribution.}
 
 \item{LN_sigma}{Numeric. Standard deviation of log-income for the
@@ -90,7 +90,7 @@ compute_headcounts(
 compute_headcounts(
   PL_vals,
   models = c("FISK", "NP"),
-  Fisk_alpha = 2, Fisk_beta = 1.5,
+  Fisk_scale = 2, Fisk_shape = 1.5,
   NP_alpha = 1.2, NP_beta = 0.8
 )
 
@@ -99,10 +99,10 @@ compute_headcounts(
   PL_vals,
   models = "all",
   Average = 50, LN_sigma = 0.6,
-  Fisk_alpha = 2, Fisk_beta = 1.5,
+  Fisk_scale = 2, Fisk_shape = 1.5,
   NP_alpha = 1.2, NP_beta = 0.8
 )
 compute_headcounts(PL_vals, models = "LN", Average = avg, LN_sigma = sigma)
-compute_headcounts(PL_vals, models = c("FISK", "NP"), Fisk_alpha = a, Fisk_beta = b, NP_alpha = na, NP_beta = nb)
+compute_headcounts(PL_vals, models = c("FISK", "NP"), Fisk_scale = a, Fisk_shape = b, NP_alpha = na, NP_beta = nb)
 compute_headcounts(PL_vals, models = "all", ...)
 }

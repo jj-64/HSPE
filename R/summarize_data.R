@@ -55,10 +55,10 @@ summarize_data <- function(indices = NA,
 
     # ---- 4. Quantiles ----
     if (percentiles) {
-      qs <- income_decile_shares(y,probs = seq(0.01, 1, 0.01), names = TRUE) #quantile(y, probs = seq(0.01, 1, 0.01), names = TRUE)
+      qs <- income_shares(y,probs = seq(0.1, 1, 0.01), names = TRUE) #quantile(y, probs = seq(0.01, 1, 0.01), names = TRUE)
       #quant_names <- names(qs)
     } else {
-      qs <- income_decile_shares(y,probs = seq(0.01, 1, 0.1), names = TRUE)
+      qs <- income_shares(y,probs = seq(0.1, 1, 0.1), names = TRUE)
       #quant_names <- paste0("d", 1:10)
       #names(qs) <- quant_names
     }
