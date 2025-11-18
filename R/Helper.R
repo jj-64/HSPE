@@ -323,7 +323,7 @@ get_observed_HC <- function(data, Country) {
   hc_cols <- hc_cols[!grepl("SE", hc_cols)]  # remove HC_SE_*
 
   # extract thresholds
-  thresholds <- as.integer(gsub("HC_", "", hc_cols))
+  thresholds <- as.integer(gsub("HC_", "", hc_cols))/100
 
   tibble::tibble(
     threshold = thresholds,
