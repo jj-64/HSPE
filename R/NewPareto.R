@@ -14,36 +14,71 @@ library(dplyr)
 ## alpha is shape
 ## beta is scale
 ## Estimate shape via optimization ---------------
-shape_NP = function(Gini){
-  ## Objective function
-  eval_f0 <- function( shape,a,b){
-    return(abs(Gini_NP(shape[1]) - Gini))
-  }
+#' Estimate New Pareto Shape Parameter
+#'
+#' Estimates the shape parameter \eqn{\alpha} of the New Pareto distribution
+#' by solving:
+#' \deqn{G(\alpha) = Gini}
+#'
+#' using derivative-free nonlinear optimization (COBYLA).
+#'
+#' @param Gini The target Gini coefficient in (0,1).
+#'
+#' @return Estimated shape parameter \eqn{\alpha}.
+#'
+#' @details
+#' The optimizer minimizes:
+#' \deqn{|G_NP(\alpha) - Gini|}
+#'
+#' subject to:
+#' \deqn{\alpha \ge 1.1.}
+#'
+#' @import nloptr
+#' @export
+#' @examples
+#' shape_NP(0.36)
+#' #[1] 2.128961
+shape_NP <- function(Gini) {
 
-  # constraint function g(x) <=0
-  eval_g0 <- function(shape, a,b) {
-    return(b- a*shape[1] )
-  }
+  if (Gini <= 0 || Gini >= 1)
+    stop("Gini must be in (0,1).")
 
-  # define parameters
-  a <- c(1)
-  b <- c(1)
+    ## Objective function
+    eval_f0 <- function( shape,a,b){
+      return(abs(Gini_NP(shape[1]) - Gini))
+    }
 
-  # Solve using NLOPT_LN_COBYLA without gradient information
-  res1 <- nloptr( x0=c(1.1),
-                  eval_f=eval_f0,
-                  lb = c(1.1),
-                  ub = c(5),
-                  eval_g_ineq = eval_g0,
-                  opts = list("algorithm"="NLOPT_LN_COBYLA",
-                              "xtol_rel"=1.0e-8),
-                  a = a,
-                  b=b)
+    # constraint function g(x) <=0
+    eval_g0 <- function(shape, a,b) {
+      return(b- a*shape[1] )
+    }
 
-  return(res1$solution)
+    # define parameters
+    a <- c(1)
+    b <- c(1)
+
+    # Solve using NLOPT_LN_COBYLA without gradient information
+    res <- nloptr( x0=c(1.1),
+                    eval_f=eval_f0,
+                    lb = c(1.1),
+                    ub = c(20),
+                    eval_g_ineq = eval_g0,
+                    opts = list("algorithm"="NLOPT_LN_COBYLA",
+                                "xtol_rel"=1.0e-8),
+                    a = a,
+                    b=b)
+
+
+  return(as.numeric(res$solution))
+
 }
 
 # Wrapper for shape as function of G (so derivative uses numeric differentiation)
+#' Safe Wrapper for shape_NP()
+#'
+#' @param Gini Gini coefficient.
+#'
+#' @return scalar numeric shape or NA.
 shape_NP_func_wrapper <- function(Gini) {
   # call your shape_NP implementation; return scalar numeric
   # add tryCatch because shape_NP uses optimizer and may fail
@@ -54,13 +89,37 @@ shape_NP_func_wrapper <- function(Gini) {
 }
 
 ## Numerical derivative for α(G) ------------------
+#' Numerical Derivative of Shape wrt Gini
+#'
+#' @param Gini Gini coefficient.
+#' @param eps Step size.
+#'
+#' @return Numeric derivative d(alpha)/d(G).
 shape_NP_deriv <- function(Gini){
   eps <- 1e-6
   (shape_NP(Gini + eps) - shape_NP(Gini - eps)) / (2 * eps)
 }
 
 ## Estimate scale from shape and mean by Optimization -------------
+#' Estimate New Pareto Scale Parameter
+#'
+#' Solves for \eqn{\theta} from:
+#' \deqn{E[Y] = \frac{2\alpha\theta \, \mathrm{Re}\{\,_2F_1(2,2-(1+\alpha)/\alpha;3-(1+\alpha)/\alpha;-1)\}}{\alpha - 1}}
+#'
+#' @param mean_y Mean income.
+#' @param shape Previously estimated shape parameter.
+#'
+#' @return Estimated scale parameter.
+#'
+#' @import nloptr
+#' @importFrom hypergeo hypergeo
+#' @export
+#' @examples
+#' scale_NP(mean_y= 8000, shape= 0.4)
+#' 515.4424
 scale_NP = function(mean_y , shape){
+  if (mean_y <= 0) stop("mean_y must be > 0")
+  if (shape <= 1)  stop("shape must be > 1 for finite mean")
   ## Objective function
   eval_f0 <- function( scale,a,b){
     return( abs((2*shape *scale *Re(hypergeo(2,2-((1+shape)/shape),3-((1+shape)/shape),-1))/(shape - 1)) - mean_y ) )
@@ -90,6 +149,11 @@ scale_NP = function(mean_y , shape){
 }
 
 # Wrapper for scale as function of (mean_y, shape)
+#' Safe Wrapper for scale_NP()
+#'
+#' @param x Numeric vector: c(mean, shape)
+#'
+#' @return scalar scale or NA
 scale_NP_func_wrapper <- function(x) {
   # x is numeric vector: c(mean_y, shape)
   mean_y <- x[1]; shape <- x[2]
@@ -107,6 +171,20 @@ scale_NP_func_wrapper <- function(x) {
 # se_Gini: SE(sample Gini)
 # cov_mean_gini: optional covariance between mean and gini (default 0)
 # eps: finite-diff step
+#' Standard Error for New Pareto Shape
+#'
+#' @param Gini Gini coefficient.
+#' @param se_Gini SE(Gini).
+#' @param shape Optional precomputed shape.
+#' @param eps Finite difference step.
+#'
+#' @return Standard error of shape.
+#'
+#' @importFrom numDeriv grad
+#' @export
+#' @examples
+#' se_shape_NP(Gini =0.36, se_Gini = 0.1, shape= 0.3)
+#' #[1] 0.4810901
 se_shape_NP <- function(Gini, se_Gini, shape =NA, eps = 1e-6) {
 
   # 1) shape (alpha) and its derivative w.r.t Gini
@@ -130,6 +208,25 @@ se_shape_NP <- function(Gini, se_Gini, shape =NA, eps = 1e-6) {
 # se_Gini: SE(sample Gini)
 # cov_mean_gini: optional covariance between mean and gini (default 0)
 # eps: finite-diff step
+#' Standard Error for New Pareto Scale Parameter
+#'
+#' @param mean_y Mean income.
+#' @param Gini Gini coefficient.
+#' @param se_mean SE(mean).
+#' @param se_Gini SE(Gini).
+#' @param shape Optional shape (cached).
+#' @param se_shape Optional SE(shape).
+#' @param scale Optional scale (cached).
+#' @param cov_mean_gini Cov(mean, Gini).
+#' @param eps finite-difference step.
+#'
+#' @return Standard error of scale.
+#'
+#' @importFrom numDeriv grad
+#' @export
+#' @examples
+#' se_scale_NP(mean_y = 6000, se_mean = 250, Gini =0.36, se_Gini = 0.1, shape= 0.3, se_shape = 0.48, scale= 150)
+#' #[1] 0.
 se_scale_NP <- function(mean_y, Gini, se_mean, se_Gini, shape=NA, se_shape = NA, scale= NA,
                        cov_mean_gini = 0, eps = 1e-6) {
   # 1) shape and its derivative w.r.t Gini
@@ -231,12 +328,32 @@ Lorenz_NP_Exact <- function(p = seq(0.1, 1, by =0.1), shape){
 #   - cluster_power: greater -> more grid density near 1; adjust 2..5 as needed.
 #   - Hessian: numeric Hessian inversion provides an approximate covariance; for more
 #     accurate SEs you can bootstrap (resample grouped residuals) – more costly.
+#' Fast Lorenz Curve for New Pareto Distribution
+#'
+#' Approximates:
+#'   L(p) = ∫₀ᵖ ∫₀ᵗ ((1+u)/(1-u))^(1/shape) du dt / denom
+#'
+#' @param p Probabilities in [0,1].
+#' @param shape Shape parameter.
+#' @param n_grid Grid resolution.
+#' @param cluster_power Grid clustering exponent.
+#'
+#' @return Lorenz curve values.
+#' @export
+#' @examples
+#' Lorenz_NP(shape=3)
+#' # [1] 0.05919209 0.12251535 0.19040316 0.26346712 0.34259232 0.42912127 0.52525375 0.63509513
+#' # [9] 0.76851956 1.00000000
 Lorenz_NP <- function(p = seq(0.1, 1, by = 0.1),
-                           shape,
-                           n_grid = 3000,
-                           cluster_power = 3,
-                           eps = 1e-12) {
-  if (shape <= 0) stop("shape must be positive")
+                      shape,
+                      n_grid = 3000,
+                      cluster_power = 3,
+                      eps = 1e-12) {
+
+  if (shape <= 0)
+    stop("shape must be positive")
+
+
   # create non-uniform grid on [0, 1) clustering near 1
   u <- seq(0, 1, length.out = n_grid)
   t_grid <- 1 - (1 - u)^cluster_power
@@ -245,23 +362,22 @@ Lorenz_NP <- function(p = seq(0.1, 1, by = 0.1),
   t_grid[length(t_grid)] <- 1 - 1e-10
 
   # inner integrand = ((1+t)/(1-t))^(1/shape)
-  inner_f <- function(t) {
-    ((1 + t) / (1 - t))^(1 / shape)
-  }
+  inner_f <- function(t)
+    ((1 + t)/(1 - t))^(1/shape)
 
-  fvals <- inner_f(t_grid)
 
   # cumulative integral by trapezoid: cumulative integral from 0 to t_i
   # compute trapezoid increments
+  fvals <- inner_f(t_grid)
   dx <- diff(t_grid)
-  trap_incr <- 0.5 * dx * (fvals[-1] + fvals[-length(fvals)])
-  cumint <- c(0, cumsum(trap_incr))  # same length as t_grid
+  inc <- 0.5 * dx * (fvals[-1] + fvals[-n_grid])
+  cumint <- c(0, cumsum(inc))
 
   ## denominator is cumulative integral at p = 1 (but that's limited from <1)
-  denom <- cumint[length(cumint)]
   # denom <- Re(shape * hypergeo::hypergeo(1,-1/shape,2-1/shape,-1) / (shape-1) ) ## exact
-
-  if (!is.finite(denom) || denom <= 0) stop("denominator non-finite; check shape")
+  denom <- cumint[n_grid]
+  if (!is.finite(denom) || denom <= 0)
+    stop("denominator not finite")
 
   # for requested p, simple interpolation of cumint vs t_grid
   # ensure p within [0, 1-eps]
@@ -270,44 +386,86 @@ Lorenz_NP <- function(p = seq(0.1, 1, by = 0.1),
   p_req[p_req < 0] <- 0
   Lvals <- approx(x = t_grid, y = cumint, xout = p_req, rule = 2)$y / denom
 
+  #p[p >= 1] <- 1 - 1e-10
+  #approx(x = t_grid, y = cumint, xout = p)$y / denom
   return(Lvals)
-}
-## Quantile function to build Lorenz curve, returns the percentile ------------
-Percentile_NP = function(shape, q) {
-
-  doubleInt <- function(q,shape){
-    f <- function(t,shape){((1+t)/(1-t))^(1/shape)}
-    fvalue = c()
-    for (i in seq_along(q)) fvalue[i] <- integrate(f,lower=0,upper=q[i],shape=shape)$value
-    return(fvalue)
-  }
-
-  return ( doubleInt(q,shape)/  Re(shape * hypergeo::hypergeo(1,-1/shape,2-1/shape,-1) / (shape-1) ) )
-
 }
 
 ## pdf of NewPareto --------------------
-pdf_NP = function(shape,scale,p) {
-  return(ifelse(p>= scale, (2 * shape * scale^shape *p^(shape-1) ) / (p^shape + scale^shape)^2 ,0))
+#' New Pareto PDF
+#'
+#' @param shape Shape parameter.
+#' @param scale Scale (minimum income).
+#' @param p Income values.
+#'
+#' @return Density values.
+#' @export
+#' @examples
+#' pdf_NP(2000, shape= 2, scale=100)
+#' #[1]0.000004975093
+pdf_NP <- function(p, shape, scale) {
+  ifelse(
+    p >= scale,
+    (2 * shape * scale^shape * p^(shape - 1)) /
+      (p^shape + scale^shape)^2,
+    0
+  )
 }
 
 ## CDF of NewPareto ----------------
-CDF_NP = function(q, shape,scale) {
+#' New Pareto CDF
+#'
+#' @param q Quantile/income.
+#' @param shape Shape parameter.
+#' @param scale Scale parameter.
+#'
+#' @return CDF value.
+#' @export
+#' @examples
+#' CDF_NP(2000, shape= 2, scale=100)
+#' #[1] 0.9950125
+CDF_NP <- function(q, shape, scale) {
   q <- as.numeric(q)
-  out <- ifelse(q < scale, 0, 1 - 2 / (1 + (q / scale)^shape))
-  return(out)
+  ifelse(
+    q < scale,
+    0,
+    1 - 2 / (1 + (q/scale)^shape)
+  )
 }
 
 ## Quantile Function from percentiles ------------------
+#' New Pareto Quantile function
+#'
+#' @param p numerical vector, probability between 0 and  1.
+#' @param shape Shape parameter.
+#' @param scale Scale parameter.
+#'
+#' @return quantile value.
+#' @export
+#' @examples
+#' Quantile_NP(0.2, shape= 2, scale=100)
+#' #[1] 122.4745
 Quantile_NP <- function(p, shape, scale) {
+  if(p <=0 | p>=1) stop("p shoule be between 0 and 1")
   # p in (0,1). Solve 1 - 2/(1+(q/scale)^shape) = p => q = scale * ((2/(1-p)-1)^(1/shape))
   if (any(p >= 1 | p <= 0)) stop("p must be in (0,1)")
   scale * ((2 / (1 - p) - 1)^(1 / shape))
 }
 
-## Radom Generated NP ----------------------
+## Random Generated NP ----------------------
 #NP distributed x: Given a uniform variate U drawn from U(0, 1) distribution, we obtain X, which is NP distributed and is given by
-random_NP <- function (u,a,b){(((2*(b^a))/u)-(b^a))^(1/a)}
+#' New Pareto Random generating function
+#'
+#' @param u numerical vector, uniform number between 0 and  1.
+#' @param shape Shape parameter.
+#' @param scale Scale parameter.
+#'
+#' @return NP value.
+#' @export
+#' @examples
+#' random_NP(0.2, shape= 2, scale=100)
+#' #[1] 300
+random_NP <- function (u,shape, scale){(((2*(scale^shape))/u)-(scale^shape))^(1/shape)}
 
 ## Gini from NP distribution ------------------
 Gini_NP_Exact <- function(shape){
@@ -794,4 +952,59 @@ fit_np <- function(y, pc.inc, gini.e, N = NULL,
   )
 
   out
+}
+
+## fit_NP_param function ------------------
+#' Fast Estimation of NewPareto Parameters Using Mean and Gini
+#'
+#' Computes:
+#' shape as in \code{\link{shape_NP}}
+#' scale  as in \code{\link{scale_NP}}
+#'
+#' Optionally computes delta-method standard errors as in
+#'  \code{\link{se_shape_NP}} and  \code{\link{se_scale_NP}}
+#'
+#' @param mean_y Mean of the data (must be > 0)
+#' @param Gini Gini coefficient in (0,1)
+#' @param se_mean Standard error of mean (optional)
+#' @param se_Gini Standard error of Gini (optional)
+#'
+#' @return A list with:
+#'   \describe{
+#'     \item{par}{c(shape, scale)}
+#'     \item{se}{c(se_shape, se_scale)}
+#'   }
+#' @export
+#' @examples
+#' fit_NP_param(6000, 0.36, se_mean = 250, se_Gini = 0.01)
+#' $par
+#' # shape       scale
+#' #  2.128961  2523.457703
+#' #
+#' # se_shape     se_scale
+#' # 0.04810901 125.06197149
+fit_NP_param <- function(mean_y, Gini, se_mean = NA, se_Gini = NA) {
+
+  # --- domain checks ---
+  if (mean_y <= 0) stop("mean_y must be > 0.")
+  if (Gini <= 0 || Gini >= 1) stop("Gini must be in (0,1).")
+
+  # parameters
+  shape <- shape_NP(Gini)
+  scale    <- scale_NP(mean_y, shape)
+
+  # SEs
+  if (!is.na(se_mean) && !is.na(se_Gini)) {
+    se_shape <- se_shape_NP(Gini, se_Gini, shape)
+    se_scale <- se_scale_NP(mean_y, Gini, se_mean, se_Gini, shape, se_shape)
+
+  } else {
+    se_shape <- NA
+    se_scale    <- NA
+  }
+
+  list(
+    par = c(shape = shape, scale = scale),
+    se  = c(se_shape = se_shape , se_scale = se_scale)
+  )
 }
