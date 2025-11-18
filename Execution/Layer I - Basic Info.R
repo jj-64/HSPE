@@ -18,17 +18,21 @@ for (i in seq_len(nrow(data))) {
   Gini1   <- data$Gini[i]
   se_Gini1 <- data$Gini_SE[i]
   N = data$N[i]
+  Country = data$Country[i]
 
   ## Extract PL values
-  ci_lower_cols <- grep("CI_lower_", names(data), value = TRUE)
-  ci_upper_cols <- grep("CI_upper_", names(data), value = TRUE)
-  thresholds <- as.numeric(stringr::str_extract(ci_lower_cols, "\\d+"))/100 ## get thresholds from the suffix
+  #ci_lower_cols <- grep("CI_lower_", names(data), value = TRUE)
+  #ci_upper_cols <- grep("CI_upper_", names(data), value = TRUE)
+  #thresholds <- as.numeric(stringr::str_extract(ci_lower_cols, "\\d+"))/100 ## get thresholds from the suffix
 
   ## Extract observed Headcount
   #HC_obs_cols <- grep("^HC_", names(data), value = TRUE)
   #HC_obs_cols <- HC_obs_cols[!grepl("SE", HC_obs_cols)]  # remove HC_SE_*
-  HC_obs_cols <- which(colnames(data) %in% paste0("HC_", thresholds*100) )
-  HC_obs = as.numeric(data[i, HC_obs_cols])
+  #HC_obs_cols <- which(colnames(data) %in% paste0("HC_", thresholds*100) )
+  #HC_obs = as.numeric(data[i, HC_obs_cols])
+
+  HC_obs = get_observed_HC(data, Country)$observed_HC
+  thresholds = get_observed_HC(data, Country)$threshold/100
 
   # --- Distribution parameters ---
         ## Fisk
@@ -103,7 +107,7 @@ for (i in seq_len(nrow(data))) {
     PL_vals$pl,
     function(x)
       HC_se_LN (x, mean_y = Average,
-                LN_sigma = LN_sigma,
+                sigma = LN_sigma,
                 se_mean = se_Average,
                 se_sigma = se_LN_sigma,
                 cov_mu_sigma = 0)
