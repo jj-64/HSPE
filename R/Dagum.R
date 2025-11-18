@@ -1,3 +1,7 @@
+CDF_DA <- function(y, a, b, p)
+  { (1 + (y / b)^(-a))^(-p) }
+#VGAM::pdagum(q=y, shape1.a = a, shap2.p = p, scale=b)
+
 HC_se_DA <- function(pov_line, a, b, p, se_a, se_b, se_p) {
   # pov_line: poverty line(s)
   # a, b, p: Dagum parameters

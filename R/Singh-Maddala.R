@@ -1,3 +1,7 @@
+CDF_SM <- function(y, a, b, q)
+{ VGAM::psinmad(q=y, scale = b , shape1.a = a, shape3.q = q) }
+
+
 HC_se_SM <- function(pov_line, a, b, q, se_a, se_b, se_q) {
   # pov_line: poverty line(s)
   # a, b, q: Singh-Maddala parameters
