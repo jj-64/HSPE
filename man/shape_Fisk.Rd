@@ -7,7 +7,7 @@
 shape_Fisk(Gini)
 }
 \arguments{
-\item{Gini}{Observed Gini coefficient.}
+\item{Gini}{Numeric in (0,1). The Gini coefficient}
 }
 \value{
 Shape parameter.

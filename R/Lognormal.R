@@ -219,3 +219,57 @@ HC_se_LN <- function(pov_line, mean_y, sigma, se_mean, se_sigma, cov_mu_sigma = 
 
   sqrt(var_H)
 }
+
+## fit_fisk_param function ------------------
+#' Fast Estimation of Lognormal Parameters Using Mean and Gini
+#'
+#' Computes:
+#'   sigma = sqrt(2) * qnorm((1+Gini)/2)
+#'   mu    = log(mean) - sigma^2/2
+#'
+#' Optionally computes delta-method standard errors.
+#'
+#' @param mean_y Mean of the data (must be > 0)
+#' @param Gini Gini coefficient in (0,1)
+#' @param se_mean Standard error of mean (optional)
+#' @param se_Gini Standard error of Gini (optional)
+#'
+#' @return A list with:
+#'   \describe{
+#'     \item{par}{c(mu, sigma)}
+#'     \item{se}{c(se_mu, se_sigma)}
+#'   }
+#' @export
+#' @examples
+#' fit_LN_param(6000, 0.36, se_mean = 250, se_Gini = 0.01)
+#' $par
+#' # mu    sigma
+#' # 8.480773 0.661426
+#' #
+#' # $se
+#' # se_mu   se_sigma
+#' # 0.04367100 0.01977307
+fit_LN_param <- function(mean_y, Gini, se_mean = NA, se_Gini = NA) {
+
+  # --- domain checks ---
+  if (mean_y <= 0) stop("mean_y must be > 0.")
+  if (Gini <= 0 || Gini >= 1) stop("Gini must be in (0,1).")
+
+  # parameters
+  sigma <- Sigma_LN(Gini)
+  mu    <- mu_LN(mean_y, sigma)
+
+  # SEs
+  if (!is.na(se_mean) && !is.na(se_Gini)) {
+    se_sigma <- se_sigma_LN(mean_y, Gini, se_Gini)
+    se_mu    <- se_mu_LN(mean_y, Gini, se_mean, se_Gini)
+  } else {
+    se_sigma <- NA
+    se_mu    <- NA
+  }
+
+  list(
+    par = c(mu = mu, sigma = sigma),
+    se  = c(se_mu = se_mu, se_sigma = se_sigma)
+  )
+}

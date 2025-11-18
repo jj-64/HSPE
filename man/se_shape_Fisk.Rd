@@ -7,7 +7,7 @@
 se_shape_Fisk(Gini, se_Gini)
 }
 \arguments{
-\item{Gini}{Observed Gini.}
+\item{Gini}{Numeric in (0,1). The Gini coefficient}
 
 \item{se_Gini}{Standard error of the Gini estimate.}
 }

@@ -7,13 +7,13 @@
 se_scale_Fisk(mean_y, Gini, se_mean, se_Gini, shape_Fisk = NA)
 }
 \arguments{
-\item{mean_y}{Mean income.}
+\item{mean_y}{numerical value, observed mean of the variable.}
 
-\item{Gini}{Observed Gini.}
+\item{Gini}{Numeric in (0,1). The Gini coefficient}
 
-\item{se_mean}{SE of the mean.}
+\item{se_mean}{Standard error of mean.}
 
-\item{se_Gini}{SE of the Gini.}
+\item{se_Gini}{Standard error of Gini.}
 
 \item{shape_Fisk}{Optional shape value (otherwise computed from Gini).}
 }

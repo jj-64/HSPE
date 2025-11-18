@@ -9,7 +9,7 @@ scale_Fisk(shape, mean_y)
 \arguments{
 \item{shape}{Shape parameter.}
 
-\item{mean_y}{Target mean income.}
+\item{mean_y}{numerical value, observed mean of the variable.}
 }
 \value{
 Scale parameter consistent with the specified mean.
