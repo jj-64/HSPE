@@ -87,7 +87,7 @@ Outlier_range = function(fyy2,r=1.5){
 
 
 ## Income deciles from observed micro data
-income_decile_shares <- function(y, probs = seq(0.01, 1, by = 0.1) , names = TRUE) {
+income_decile_shares <- function(y, probs = seq(0.1, 1, by = 0.1) , names = TRUE) {
   y <- sort(y)
   n <- length(y)
 
