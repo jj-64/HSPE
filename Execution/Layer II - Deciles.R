@@ -21,14 +21,14 @@ for(i in seq_along(data)){
 
   ## Extract observed Headcount
   observed_HC <- get_observed_HC(data, Country)  # threshold + observed_HC
-  thresholds <- observed_HC$threshold
+  thresholds <- observed_HC$threshold/100
 
   # Lorenz shares
   L_values = as.numeric(get_observed_deciles(data, Country))
-  L_nonCum <- diff(L_values)
+  L_nonCum <- income_shares_nonCum(L_values)
 
   ## Poverty Lines
-  PL_vals <-  thresholds/100 * Average
+  PL_vals <-  thresholds * Average
 
   # Storage
   # H_row <- data.frame(
@@ -43,7 +43,7 @@ for(i in seq_along(data)){
   # Fit each distribution
     models <- names(CDF_registry)
 
-    Param <- data.frame(Parameter = unique(unlist(lapply(CDF_registry, `[[`, "params"))))
+    SUM_Param <- data.frame(Parameter = unique(unlist(lapply(CDF_registry, `[[`, "params"))))
 
     results = list()
 
@@ -52,12 +52,12 @@ for(i in seq_along(data)){
 
       fit <- fit_model_grouped(model, L_nonCum, mean_y = Average, Gini = Gini1, N = N)
       if(!fit$ok){
-        Param <- compute_param_summary2(Param, model, NA, NA)
+        SUM_Param <- compute_param_summary2(SUM_Param, model, NA, NA)
         HC <- NA
                } else {
 
       # Add parameter estimates to table
-      Param <- compute_param_summary2(Param, model, fit$par, fit$se)
+      SUM_Param <- compute_param_summary2(SUM_Param, model, fit$par, fit$se)
 
       # Compute headcounts
       cdf_fun <- get(CDF_registry[[model]]$cdffun)
@@ -71,7 +71,7 @@ for(i in seq_along(data)){
         model_H = HC
       )
 
-      Param$Country = Country
+      SUM_Param$Country = Country
 
       }
 
@@ -86,7 +86,7 @@ for(i in seq_along(data)){
     ## Save Results
     # Store results
     combined_HC[[i]]  <- SUM_H
-    combined_Param[[i]] <- Param
+    combined_Param[[i]] <- SUM_Param
   }
 
 
