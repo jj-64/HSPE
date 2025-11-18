@@ -684,13 +684,13 @@ se_newpareto_boot <- function(incomes, R = 1000, seed = 1234, shape_init = NULL)
 }
 
 ## Headcount SE ------------------
-HC_se_NP <- function(x, shape, scale, se_shape, se_scale, cov_shape_scale = 0) {
+HC_se_NP <- function(pov_line, shape, scale, se_shape, se_scale, cov_shape_scale = 0) {
 
   # compute u = (p/scale)^shape
-  u <- (x / scale)^shape
+  u <- (pov_line / scale)^shape
 
   # HC derivative components
-  dH_da <- (1 + u)^(-2) * 2 * u * log(x / scale)  ## derivative w.r.t shape
+  dH_da <- (1 + u)^(-2) * 2 * u * log(pov_line / scale)  ## derivative w.r.t shape
   dH_db <- (1 + u)^(-2) * 2* u * (-shape / scale) ## derivative w.r.t scale
 
   # delta-method variance
