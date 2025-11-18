@@ -8,6 +8,7 @@ library(GB2group)
 # -------------------------
 combined_HC = list()
 combined_Param = list()
+combined_HC_CI = list()
 
 for(i in seq_along(data)){
 
@@ -21,7 +22,7 @@ for(i in seq_along(data)){
 
   ## Extract observed Headcount
   observed_HC <- get_observed_HC(data, Country)  # threshold + observed_HC
-  thresholds <- observed_HC$threshold/100
+  thresholds <- observed_HC$threshold
 
   # Lorenz shares
   L_values = as.numeric(get_observed_deciles(data, Country))
@@ -50,7 +51,9 @@ for(i in seq_along(data)){
     ## Loop over all models
     for(model in models) {
 
-      fit <- fit_model_grouped(model, L_nonCum, mean_y = Average, Gini = Gini1, N = N)
+      fit <- fit_model_grouped(model, L_nonCum, mean_y = Average,
+                               Gini = Gini1, N = N, nrep=1000)
+
       if(!fit$ok){
         SUM_Param <- compute_param_summary2(SUM_Param, model, NA, NA)
         HC <- NA
@@ -62,6 +65,10 @@ for(i in seq_along(data)){
       # Compute headcounts
       cdf_fun <- get(CDF_registry[[model]]$cdffun)
       HC <- 100 * cdf_fun(PL_vals, as.list(fit$par))
+
+       ## Compute headcounts SE
+      HCSE_fun <- get(CDF_registry[[model]]$HCsefun)
+      HC_SE <- HCSE_fun(PL_vals, as.list(fit$par), as.list(fit$se))
                }
 
       results[[model]] <- tibble::tibble(
@@ -84,15 +91,16 @@ for(i in seq_along(data)){
         dplyr::select(Country, threshold, observed_HC, model, model_H)
 
     ## Save Results
-    # Store results
     combined_HC[[i]]  <- SUM_H
     combined_Param[[i]] <- SUM_Param
   }
 
+combined_HC_df  <- bind_rows(combined_HC)
+combined_Param_df <- bind_rows(combined_Param)
 
-
+######### Fit statistics -----------
     # KS statistic (synthetic sample)
-    if(name %in% c("Dagum","SM")){
+    if(model %in% c("DA","SM")){
       sample <- switch(name,
                        Dagum = rdagum(N, par$b, par$a, par$p),
                        SM    = rsm(N, par$b, par$a, par$p))
