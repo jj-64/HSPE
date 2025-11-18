@@ -20,7 +20,7 @@ HC_se_SM <- function(pov_line, a, b, q, se_a, se_b, se_q) {
   dF_dq <-  u^(-q) * log(u)
 
   # gradient matrix
-  vcov = diag(c(se_a, se_b, se_q))
+  vcov = diag(as.numeric(c(se_a, se_b, se_q))^2)
   G <- cbind(dF_da, dF_db, dF_dq)
 
   # delta-method variance

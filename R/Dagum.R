@@ -22,7 +22,7 @@ HC_se_DA <- function(pov_line, a, b, p, se_a, se_b, se_p) {
   G <- cbind(dF_da, dF_db, dF_dp)
 
   # delta-method variance for each poverty line
-  vcov = diag(c(se_a, se_b, se_p))
+  vcov = diag(as.numeric(c(se_a, se_b, se_p))^2)
   var_H <- rowSums((G %*% vcov) * G)
 
   # numerical safety
