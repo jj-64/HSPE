@@ -9,7 +9,8 @@ fit_model_grouped(
   L_nonCum,
   mean_y,
   Gini,
-  N
+  N,
+  nrep = 1000
 )
 }
 \arguments{
