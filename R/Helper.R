@@ -396,3 +396,11 @@ Param[match(names(se), Param$Parameter), se_col] <- se
 
 Param
 }
+
+
+## NonCumulative shares ------------
+income_shares_nonCum = function(cumul){
+  noncL = cumul[1]
+  for(j in 2:length(cumul)) noncL[j] = cumul[j]- cumul[j-1]
+  return(noncL)
+}
