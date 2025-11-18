@@ -32,7 +32,7 @@ for (i in seq_len(nrow(data))) {
   #HC_obs = as.numeric(data[i, HC_obs_cols])
 
   HC_obs = get_observed_HC(data, Country)$observed_HC
-  thresholds = get_observed_HC(data, Country)$threshold/100
+  thresholds = get_observed_HC(data, Country)$threshold
 
   # --- Distribution parameters ---
         ## Fisk
