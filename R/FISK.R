@@ -20,8 +20,8 @@
 #'
 #' @export
 #' @examples
-#' CDF_Fisk(1:5, scale = 2, shape = 3)
-CDF_Fisk <- function(y, scale, shape) {
+#' CDF_FISK(1:5, scale = 2, shape = 3)
+CDF_FISK <- function(y, scale, shape) {
   if (scale <= 0 || shape <= 0)
     stop("scale and shape must be > 0")
 
@@ -49,8 +49,8 @@ CDF_Fisk <- function(y, scale, shape) {
 #'
 #' @export
 #' @examples
-#' pdf_Fisk(1:5, scale = 2, shape = 3)
-pdf_Fisk <- function(y, scale, shape) {
+#' pdf_FISK(1:5, scale = 2, shape = 3)
+pdf_FISK <- function(y, scale, shape) {
   if (scale <= 0 || shape <= 0)
     stop("scale and shape must be > 0")
 
@@ -69,8 +69,8 @@ pdf_Fisk <- function(y, scale, shape) {
 #'
 #' @export
 #' @examples
-#' mean_Fisk(scale = 2, shape = 3)
-mean_Fisk <- function(shape, scale) {
+#' mean_FISK(scale = 2, shape = 3)
+mean_FISK <- function(shape, scale) {
   if (shape <= 1)
     return(NA_real_)  # Mean does not exist
 
@@ -86,8 +86,8 @@ mean_Fisk <- function(shape, scale) {
 #'
 #' @export
 #' @examples
-#' Gini_Fisk(3)
-Gini_Fisk <- function(shape) {
+#' Gini_FISK(3)
+Gini_FISK <- function(shape) {
   if (shape <= 0)
     stop("shape must be > 0")
   1 / shape
@@ -102,8 +102,8 @@ Gini_Fisk <- function(shape) {
 #' @return Scale parameter consistent with the specified mean.
 #' @export
 #' @examples
-#' scale_Fisk (3, 4000)
-scale_Fisk <- function(shape, mean_y) {
+#' scale_FISK (3, 4000)
+scale_FISK <- function(shape, mean_y) {
   if (shape <= 1)
     stop("Mean exists only if shape > 1")
 
@@ -118,8 +118,8 @@ scale_Fisk <- function(shape, mean_y) {
 #' @return Shape parameter.
 #' @export
 #' @examples
-#' shape_Fisk (0.367)
-shape_Fisk <- function(Gini) {
+#' shape_FISK (0.367)
+shape_FISK <- function(Gini) {
   if (Gini <= 0 || Gini >= 1)
     stop("Gini must be in (0,1)")
 
@@ -137,13 +137,13 @@ shape_Fisk <- function(Gini) {
 #' @return Standard error of the Fisk shape parameter.
 #' @export
 #' @examples
-#' se_shape_Fisk (0.36, 0.012)
-se_shape_Fisk <- function(Gini, se_Gini) {
+#' se_shape_FISK (0.36, 0.012)
+se_shape_FISK <- function(Gini, se_Gini) {
   # Derivative dbeta/dG
   d_b_dG <- -1 / (Gini^2)
 
-  se_shape_Fisk <- abs(d_b_dG) * se_Gini
-  return(se_shape_Fisk)
+  se_shape_FISK <- abs(d_b_dG) * se_Gini
+  return(se_shape_FISK)
 }
 
 #######  Standard Error of a point estimate --------------
@@ -153,36 +153,36 @@ se_shape_Fisk <- function(Gini, se_Gini) {
 #' @param Gini Numeric in (0,1). The Gini coefficient
 #' @param se_mean Standard error of mean.
 #' @param se_Gini Standard error of Gini.
-#' @param shape_Fisk Optional shape value (otherwise computed from Gini).
+#' @param shape_FISK Optional shape value (otherwise computed from Gini).
 #'
 #' @return Standard error of the Fisk scale parameter.
 #' @export
 #' @examples
-#' se_scale_Fisk (4000,0.36, 750,0.012)
-se_scale_Fisk <- function(mean_y, Gini, se_mean, se_Gini,
-                          shape_Fisk = NA)
+#' se_scale_FISK (4000,0.36, 750,0.012)
+se_scale_FISK <- function(mean_y, Gini, se_mean, se_Gini,
+                          shape_FISK = NA)
 {
-  if (is.na(shape_Fisk)) shape_Fisk <- 1 / Gini
+  if (is.na(shape_FISK)) shape_FISK <- 1 / Gini
 
   # derivative d(shape)/d(Gini)
   d_b_dG <- -1 / (Gini^2)
 
   # derivative d(scale)/d(mean)
-  h_b <- gamma(1 + 1 / shape_Fisk) * gamma(1 - 1 / shape_Fisk)
+  h_b <- gamma(1 + 1 / shape_FISK) * gamma(1 - 1 / shape_FISK)
   d_a_dmean <- 1 / h_b
 
   # derivative d(scale)/d(shape) (numeric)
   eps <- 1e-6
-  a_plus  <- scale_Fisk(shape_Fisk + eps, mean_y)
-  a_minus <- scale_Fisk(shape_Fisk - eps, mean_y)
+  a_plus  <- scale_FISK(shape_FISK + eps, mean_y)
+  a_minus <- scale_FISK(shape_FISK - eps, mean_y)
   d_a_db  <- (a_plus - a_minus) / (2 * eps)
 
   # chain rule d(scale)/d(Gini)  db/dG = db/da * da/dG
   d_a_dG <- d_a_db * d_b_dG
 
-  se_shape_Fisk <- sqrt((d_a_dmean * se_mean)^2 +
+  se_shape_FISK <- sqrt((d_a_dmean * se_mean)^2 +
          (d_a_dG    * se_Gini)^2)
-  return(se_shape_Fisk)
+  return(se_shape_FISK)
 }
 
 
@@ -203,8 +203,8 @@ se_scale_Fisk <- function(mean_y, Gini, se_mean, se_Gini,
 #'
 #' @export
 #' @examples
-#' Lorenz_Fisk(p= seq(0.1, 1, by=0.1), shape = 3)
-Lorenz_Fisk <- function(p, shape) {
+#' Lorenz_FISK(p= seq(0.1, 1, by=0.1), shape = 3)
+Lorenz_FISK <- function(p, shape) {
   if (shape <= 1)
     stop("Lorenz curve exists only if shape > 1")
 
@@ -228,15 +228,15 @@ Lorenz_Fisk <- function(p, shape) {
 #'
 #' @export
 #' @examples
-#' HC_se_Fisk(2, shape = 3, scale = 2, se_shape = 0.1, se_scale = 0.2)
-HC_se_Fisk <- function(x, shape, scale, se_shape, se_scale,
+#' HC_se_FISK(2, shape = 3, scale = 2, se_shape = 0.1, se_scale = 0.2)
+HC_se_FISK <- function(pov_line, shape, scale, se_shape, se_scale,
                        cov_shape_scale = 0)
 {
   # compute u = (p/scale)^shape
-  u <- (x / scale)^shape
+  u <- (pov_line / scale)^shape
 
   # derivatives of HC = 1 - F(x)
-  dH_db <- (1 + u)^(-2) * u * log(x / scale)         # wrt shape
+  dH_db <- (1 + u)^(-2) * u * log(pov_line / scale)         # wrt shape
   dH_da <- (1 + u)^(-2) * u * (-shape / scale)       # wrt scale
 
   # delta-method variance
@@ -268,7 +268,7 @@ HC_se_Fisk <- function(x, shape, scale, se_shape, se_scale,
 #'   }
 #' @export
 #' @examples
-#' fit <- fit_Fisk_param(mean_y= 20000, Gini = 0.32)
+#' fit <- fit_FISK_param(mean_y= 20000, Gini = 0.32)
 #' fit
 #' $par
 #' shape     scale
@@ -278,13 +278,13 @@ HC_se_Fisk <- function(x, shape, scale, se_shape, se_scale,
 #' se_shape se_scale
 #' NA       NA
 
-fit_Fisk_param <- function(mean_y, Gini, se_mean = NA, se_Gini = NA) {
+fit_FISK_param <- function(mean_y, Gini, se_mean = NA, se_Gini = NA) {
 
   # --- validation ---
   if (Gini <= 0 || Gini >= 1)
     stop("Gini must be in (0,1).")
 
-  shape <- shape_Fisk(Gini)
+  shape <- shape_FISK(Gini)
 
   if (shape <= 1)
     stop("For Fisk, the mean exists only if shape > 1 (i.e. Gini < 1).")
@@ -293,18 +293,18 @@ fit_Fisk_param <- function(mean_y, Gini, se_mean = NA, se_Gini = NA) {
     stop("mean_y must be > 0.")
 
   # --- parameter estimates ---
-  scale <- scale_Fisk(shape, mean_y)
+  scale <- scale_FISK(shape, mean_y)
 
   # --- standard errors (optional) ---
   if (!is.na(se_mean) && !is.na(se_Gini)) {
 
-    se_shape <- se_shape_Fisk(Gini, se_Gini)
-    se_scale <- se_scale_Fisk(
+    se_shape <- se_shape_FISK(Gini, se_Gini)
+    se_scale <- se_scale_FISK(
       mean_y = mean_y,
       Gini   = Gini,
       se_mean = se_mean,
       se_Gini = se_Gini,
-      shape_Fisk = shape
+      shape_FISK = shape
     )
 
   } else {
@@ -329,7 +329,7 @@ fit_Fisk_param <- function(mean_y, Gini, se_mean = NA, se_Gini = NA) {
 #' @param p_dec Probabilities (e.g. seq(.1,.9,length.out=length(y)+1))
 #'
 #' @return Scalar loss value
-loss_Fisk <- function(params, pc.inc, gini.e, y,
+loss_FISK <- function(params, pc.inc, gini.e, y,
                       p_dec = seq(0.1, 0.9, length.out = length(y) + 1)) {
 
   shape <- params[1]
@@ -339,15 +339,15 @@ loss_Fisk <- function(params, pc.inc, gini.e, y,
   if (shape <= 1 || scale <= 0) return(1e12)
 
   # theoretical mean
-  mean_th <- mean_Fisk(shape, scale)
+  mean_th <- mean_FISK(shape, scale)
   mean_err <- (mean_th - pc.inc)^2
 
   # theoretical Gini
-  gini_th <- Gini_Fisk(shape)
+  gini_th <- Gini_FISK(shape)
   gini_err <- (gini_th - gini.e)^2
 
   # theoretical Lorenz → deciles
-  L_th <- Lorenz_Fisk(shape, P = c(0, p_dec))
+  L_th <- Lorenz_FISK(shape, P = c(0, p_dec))
   dec_th <- diff(L_th)
   dec_err <- sum((dec_th - y)^2)
 
@@ -380,9 +380,9 @@ loss_Fisk <- function(params, pc.inc, gini.e, y,
 #' }
 #'
 #' @examples
-#' fit <- fit_Fisk(y = deciles, pc.inc = 20000, gini.e = 0.32)
+#' fit <- fit_FISK(y = deciles, pc.inc = 20000, gini.e = 0.32)
 #' fit$par
-fit_Fisk <- function(y, pc.inc, gini.e, N = NULL,
+fit_FISK <- function(y, pc.inc, gini.e, N = NULL,
                      se.ewmd = TRUE, se.scale = TRUE,
                      nrep = 1000,
                      control = list(maxit = 500))
@@ -390,12 +390,12 @@ fit_Fisk <- function(y, pc.inc, gini.e, N = NULL,
   p_dec <- seq(0.1, 0.9, length.out = length(y) + 1)
 
   # starting values based on moment-matching
-  shape0 <- shape_Fisk(gini.e)              # 1/Gini
-  scale0 <- scale_Fisk(shape0, pc.inc)
+  shape0 <- shape_FISK(gini.e)              # 1/Gini
+  scale0 <- scale_FISK(shape0, pc.inc)
 
   out <- optim(
     par = c(shape = shape0, scale = scale0),
-    fn = loss_Fisk,
+    fn = loss_FISK,
     pc.inc = pc.inc,
     gini.e = gini.e,
     y = y,
@@ -414,7 +414,7 @@ fit_Fisk <- function(y, pc.inc, gini.e, N = NULL,
     par = c(shape = shape_hat, scale = scale_hat),
     value = out$value,
     convergence = out$convergence,
-    mean = mean_Fisk(shape_hat, scale_hat),
-    gini = Gini_Fisk(shape_hat)
+    mean = mean_FISK(shape_hat, scale_hat),
+    gini = Gini_FISK(shape_hat)
   )
 }
