@@ -7,7 +7,7 @@ DIAG_ROWS  <- list()
 
 models <- names(CDF_registry)
 
-## Loop over all countries
+## Loop over all countries #
 for (i in seq_len(nrow(data))) {
 
   Country    <- data$Country[i]
@@ -69,7 +69,7 @@ for (i in seq_len(nrow(data))) {
         model   = model,
         ok      = FALSE
       )
-
+      message("Failed Country ",i, "-" ,Country, " for model ", model)
       next
     }
 
@@ -87,10 +87,10 @@ for (i in seq_len(nrow(data))) {
     )
 
     # --- B) HEADCOUNTS --------------------------
-    cdf_fun  <- get(CDF_registry[[model]]$cdffun)
+    cdf_fun  <- CDF_registry[[model]]$cdffun #get()
     HC       <-  cdf_fun(PL_vals, parlist)
 
-    HCse_fun <- get(CDF_registry[[model]]$HCsefun)
+    HCse_fun <- CDF_registry[[model]]$HCsefun#get()
     HC_se    <- sapply(PL_vals, function(z) HCse_fun(z, parlist, selist))
 
     HC_ROWS[[length(HC_ROWS) + 1]] <- tibble::tibble(
@@ -104,21 +104,45 @@ for (i in seq_len(nrow(data))) {
     )
 
     # --- C) DIAGNOSTICS -------------------------
+    DIAG <-diagnostics_grouped(L_obs = L_values, Lorenz_fun = CDF_registry[[model]]$lorenzfun, parlist, N = N)
+
     DIAG_ROWS[[length(DIAG_ROWS) + 1]] <- tibble::tibble(
       Country = Country,
       model   = model,
       ok      = TRUE,
-      logLik  = fit$ll,
-      KS      = fit$KS
+      logLik  = DIAG$logLik,
+      KS      = DIAG$KS,
+      MSE     = DIAG$MSE,
+      RMSE    = DIAG$RMSE,
+      AIC     = DIAG$AIC,
+      BIC     = DIAG$BIC,
     )
+
+    message("Done Country ",i, "-" ,Country, " for model ", model)
   }
 }
 
-# bind final outputs
-PARAM_ALL <- dplyr::bind_rows(PARAM_ROWS)
+## bind final outputs -----------
+ALL_PARAM <- dplyr::bind_rows(PARAM_ROWS)
 HC_ROWS <- lapply(HC_ROWS, function(x) {
   x$HC_se <- as.numeric(x$HC_se)
   x
 })
-HC_ALL    <- dplyr::bind_rows(HC_ROWS)
-DIAG_ALL  <- dplyr::bind_rows(DIAG_ROWS)
+ALL_HC    <- dplyr::bind_rows(HC_ROWS)
+ALL_DIAG  <- dplyr::bind_rows(DIAG_ROWS)
+
+
+## Output file -----
+
+writexl::write_xlsx(
+  list(
+    "H"          = ALL_HC,
+    "Parameters" = ALL_PARAM,
+    "Diagonistic" = ALL_DIAG
+  ),
+  path = paste0(here::here("DataProcessed"),"/Grouped data.xlsx")
+)
+
+save(ALL_HC, file = "DataProcessed/HC_Grouped data.rda")
+save(ALL_PARAM, file = "DataProcessed/Param_Grouped data.rda")
+save(ALL_DIAG, file = "DataProcessed/Diag_Grouped data.rda")
