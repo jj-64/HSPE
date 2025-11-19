@@ -229,14 +229,14 @@ Lorenz_FISK <- function(p, shape) {
 #' @export
 #' @examples
 #' HC_se_FISK(2, shape = 3, scale = 2, se_shape = 0.1, se_scale = 0.2)
-HC_se_FISK <- function(pov_line, shape, scale, se_shape, se_scale,
+HC_se_FISK <- function(y, shape, scale, se_shape, se_scale,
                        cov_shape_scale = 0)
 {
   # compute u = (p/scale)^shape
-  u <- (pov_line / scale)^shape
+  u <- (y / scale)^shape
 
   # derivatives of HC = 1 - F(x)
-  dH_db <- (1 + u)^(-2) * u * log(pov_line / scale)         # wrt shape
+  dH_db <- (1 + u)^(-2) * u * log(y / scale)         # wrt shape
   dH_da <- (1 + u)^(-2) * u * (-shape / scale)       # wrt scale
 
   # delta-method variance

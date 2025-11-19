@@ -272,7 +272,7 @@ CDF_NP_integral = function(y, shape, scale) { ## the income group y, shape and s
 
   ## vector for the intergrals
 
-  integrand <- function(z) {z * pdf_NP(shape, scale, z) }
+  integrand <- function(z) {z * pdf_NP(z=z, shape=shape, scale=scale) }
   int= c()
   for(i in seq_along(y)) int[i] = integrate(integrand, lower = scale, upper = y[i])$value
 
@@ -403,11 +403,11 @@ Lorenz_NP <- function(p = seq(0.1, 1, by = 0.1),
 #' @examples
 #' pdf_NP(2000, shape= 2, scale=100)
 #' #[1]0.000004975093
-pdf_NP <- function(p, shape, scale) {
+pdf_NP <- function(y, shape, scale) {
   ifelse(
-    p >= scale,
-    (2 * shape * scale^shape * p^(shape - 1)) /
-      (p^shape + scale^shape)^2,
+    y >= scale,
+    (2 * shape * scale^shape * y^(shape - 1)) /
+      (y^shape + scale^shape)^2,
     0
   )
 }
@@ -415,7 +415,7 @@ pdf_NP <- function(p, shape, scale) {
 ## CDF of NewPareto ----------------
 #' New Pareto CDF
 #'
-#' @param q Quantile/income.
+#' @param y Quantile/income.
 #' @param shape Shape parameter.
 #' @param scale Scale parameter.
 #'
@@ -424,12 +424,12 @@ pdf_NP <- function(p, shape, scale) {
 #' @examples
 #' CDF_NP(2000, shape= 2, scale=100)
 #' #[1] 0.9950125
-CDF_NP <- function(q, shape, scale) {
-  q <- as.numeric(q)
+CDF_NP <- function(y, shape, scale) {
+  y <- as.numeric(y)
   ifelse(
-    q < scale,
+    y < scale,
     0,
-    1 - 2 / (1 + (q/scale)^shape)
+    1 - 2 / (1 + (y/scale)^shape)
   )
 }
 
@@ -684,13 +684,13 @@ se_newpareto_boot <- function(incomes, R = 1000, seed = 1234, shape_init = NULL)
 }
 
 ## Headcount SE ------------------
-HC_se_NP <- function(pov_line, shape, scale, se_shape, se_scale, cov_shape_scale = 0) {
+HC_se_NP <- function(y, shape, scale, se_shape, se_scale, cov_shape_scale = 0) {
 
   # compute u = (p/scale)^shape
-  u <- (pov_line / scale)^shape
+  u <- (y / scale)^shape
 
   # HC derivative components
-  dH_da <- (1 + u)^(-2) * 2 * u * log(pov_line / scale)  ## derivative w.r.t shape
+  dH_da <- (1 + u)^(-2) * 2 * u * log(y / scale)  ## derivative w.r.t shape
   dH_db <- (1 + u)^(-2) * 2* u * (-shape / scale) ## derivative w.r.t scale
 
   # delta-method variance

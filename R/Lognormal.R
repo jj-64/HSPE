@@ -205,13 +205,13 @@ R_Lorenz_LN = function(y, R_mu, popw, mu, sigma) { ## the income group y, region
 #' @examples
 #' HC_se_LN(900, mean_y = 2000, sigma = 0.36, se_mean = 250, se_sigma = 0.01)
 #' 0.01767621 # 1.76%
-HC_se_LN <- function(pov_line, mean_y, sigma, se_mean, se_sigma, cov_mu_sigma = 0) {
+HC_se_LN <- function(y, mean_y, sigma, se_mean, se_sigma, cov_mu_sigma = 0) {
 
-  z <- (log(pov_line / mean_y) / sigma) + sigma/2
+  z <- (log(y / mean_y) / sigma) + sigma/2
   phi_z <- dnorm(z)
 
   dH_dmean  <- phi_z * (-1 / (mean_y * sigma))
-  dH_dsigma <- phi_z * (-log(pov_line / mean_y) / sigma^2 + 0.5)
+  dH_dsigma <- phi_z * (-log(y / mean_y) / sigma^2 + 0.5)
 
   var_H <- (dH_dmean^2)  * se_mean^2 +
     (dH_dsigma^2) * se_sigma^2 +
