@@ -4,7 +4,7 @@
 \alias{se_shape_NP}
 \title{Standard Error for New Pareto Shape}
 \usage{
-se_shape_NP(Gini, se_Gini, shape = NA, eps = 0.000001)
+se_shape_NP(Gini, se_Gini, shape = NA, eps = 1e-06)
 }
 \arguments{
 \item{Gini}{Gini coefficient.}

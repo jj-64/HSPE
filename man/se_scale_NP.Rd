@@ -13,7 +13,7 @@ se_scale_NP(
   se_shape = NA,
   scale = NA,
   cov_mean_gini = 0,
-  eps = 0.000001
+  eps = 1e-06
 )
 }
 \arguments{

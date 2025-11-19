@@ -4,14 +4,14 @@
 \alias{pdf_NP}
 \title{New Pareto PDF}
 \usage{
-pdf_NP(p, shape, scale)
+pdf_NP(y, shape, scale)
 }
 \arguments{
-\item{p}{Income values.}
-
 \item{shape}{Shape parameter.}
 
 \item{scale}{Scale (minimum income).}
+
+\item{p}{Income values.}
 }
 \value{
 Density values.
