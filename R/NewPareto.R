@@ -1,15 +1,15 @@
 #install.packages("hypergeo")
-library(hypergeo)
-library(nloptr)
+#library(hypergeo)
+#library(nloptr)
 # packages
-if (!requireNamespace("numDeriv", quietly = TRUE)) {
-  install.packages("numDeriv")
-}
-if (!requireNamespace("dplyr", quietly = TRUE)) {
-  install.packages("dplyr")
-}
-library(numDeriv)
-library(dplyr)
+# if (!requireNamespace("numDeriv", quietly = TRUE)) {
+#   install.packages("numDeriv")
+# }
+# if (!requireNamespace("dplyr", quietly = TRUE)) {
+#   install.packages("dplyr")
+# }
+# library(numDeriv)
+# library(dplyr)
 
 ## alpha is shape
 ## beta is scale
@@ -58,7 +58,7 @@ shape_NP <- function(Gini) {
     b <- c(1)
 
     # Solve using NLOPT_LN_COBYLA without gradient information
-    res <- nloptr( x0=c(1.1),
+    res <- nloptr::nloptr( x0=c(1.1),
                     eval_f=eval_f0,
                     lb = c(1.1),
                     ub = c(20),
@@ -122,7 +122,7 @@ scale_NP = function(mean_y , shape){
   if (shape <= 1)  stop("shape must be > 1 for finite mean")
   ## Objective function
   eval_f0 <- function( scale,a,b){
-    return( abs((2*shape *scale *Re(hypergeo(2,2-((1+shape)/shape),3-((1+shape)/shape),-1))/(shape - 1)) - mean_y ) )
+    return( abs((2*shape *scale *Re(hypergeo::hypergeo(2,2-((1+shape)/shape),3-((1+shape)/shape),-1))/(shape - 1)) - mean_y ) )
   }
 
   # constraint function g(x) <=0
@@ -311,7 +311,7 @@ Lorenz_NP_Exact <- function(p = seq(0.1, 1, by =0.1), shape){
   }
 
   ## Gini integral
-  denominator = Re(shape * hypergeo(1,-1/shape,2-1/shape,-1) / (shape-1) )
+  denominator = Re(shape * hypergeo::hypergeo(1,-1/shape,2-1/shape,-1) / (shape-1) )
 
   L_0 = sapply(p, FUN = function(p) integrationTrap(func=doubleInt,lower=0, upper = p, shape=shape))
 
@@ -938,7 +938,7 @@ fit_np <- function(y, pc.inc, gini.e, N = NULL,
 {
   p_dec <- seq(0.1, 0.9, length.out = length(y) + 1)
 
-  out <- optim(
+  out <-  optim(
     par    = c(a = 2, b = pc.inc / 2),
     fn     = loss_NP,
     pc.inc = pc.inc,

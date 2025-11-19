@@ -1,29 +1,10 @@
-library(dplyr)
-library(readxl)
-library(writexl)
-library(GB2group)
-library(GB2)
-library(laeken)
-options(scipen = 999)
-
-# Helper: Compute CDF functions -----------------------------
-CDF_DA_param <- function(y, param){CDF_DA(y=y, a = param$a, b= param$b, p = param$p) }
-CDF_SM_param <- function(y, param){CDF_SM(y = y, a = param$a, b= param$b, q = param$q )}
-CDF_B2_param <- function(y, param){ CDF_B2 (y=y, b= param$b, p= param$p, q = param$q) }
-CDF_GB2_param <- function(y, param){ CDF_GB2(y =y, a = param$a, b= param$b, p= param$p, q = param$q) }
-CDF_NP_param <- function(y, param) {ifelse(y >= param$scale, 1 - 2/(1 + (y/param$scale)^param$shape), 0) }
-CDF_FISK_param <- function(y, param){CDF_FISK(y=y, scale=param$b, shape= param$a)}
-CDF_LN_param <- function(y, param){CDF_LN(y=y, mean_y= exp(param$mu), s= param$s)}
-
-# Helper: Compute HC SE functions -----------------------------
-HC_SE_DA_param <- function(z, param, param_se){HC_se_DA(pov_line=z, b=param$b, a= param$a, p= param$p, se_a= param_se$a, se_b= param_se$b, se_p = param_se$p)}
-HC_SE_SM_param <- function(z, param, param_se){HC_se_SM(pov_line=z, b=param$b, a= param$a, q= param$q, se_a= param_se$a, se_b= param_se$b, se_q = param_se$q)}
-HC_SE_B2_param <- function(z, param, param_se){HC_se_B2(y=z, b=param$b, p= param$p, q= param$q, se_p= param_se$p, se_b= param_se$b, se_q = param_se$q)}
-HC_SE_GB2_param <- function(z, param, param_se){HC_se_GB2(y=z, a=param$a, b=param$b, p= param$p, q= param$q, se_a = param_se$a, se_p= param_se$p, se_b= param_se$b, se_q = param_se$q)}
-
-HC_se_FISK_param <- function(z, param, param_se){HC_se_FISK(pov_line=z, scale=param$b, shape= param$a, se_shape = param_se$a, se_scale = param_se$b)}
-HC_se_LN_param <- function(z, param, param_se){HC_se_LN(pov_line=z, mean_y=exp(param$mu), sigma= param$s, se_mean = param_se$a, se_sigma = param_se$b)}
-HC_se_NP_param <- function(z, param, param_se){HC_se_NP(pov_line=z, scale=param$scale, shape= param$shape, se_shape = param_se$scale, se_scale = param_se$shape)}
+# library(dplyr)
+# library(readxl)
+# library(writexl)
+# library(GB2group)
+# library(GB2)
+# library(laeken)
+#options(scipen = 999)
 
 # Helper: CDF Registry -----------------------------
 #

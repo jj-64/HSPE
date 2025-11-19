@@ -1,4 +1,4 @@
-library("fitdistrplus")
+#library("fitdistrplus")
 
 fitdagum <-function(y){
 ddagum  <-function(x,a, b, c) VGAM::ddagum(x, scale= b, shape1.a = a, shape2.p = c)

@@ -4,7 +4,7 @@
 \alias{HC_se_LN}
 \title{Standard Error of Lognormal Headcount Ratio}
 \usage{
-HC_se_LN(pov_line, mean_y, sigma, se_mean, se_sigma, cov_mu_sigma = 0)
+HC_se_LN(y, mean_y, sigma, se_mean, se_sigma, cov_mu_sigma = 0)
 }
 \arguments{
 \item{mean_y}{numerical value, observed mean of the variable}

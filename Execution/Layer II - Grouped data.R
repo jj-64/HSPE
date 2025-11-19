@@ -1,4 +1,5 @@
 load("DataProcessed/SumData.rda")
+load("DataProcessed/HC_Grouped data.rda")
 
 # final storage as clean long-format tibbles
 PARAM_ROWS <- list()
@@ -123,26 +124,26 @@ for (i in seq_len(nrow(data))) {
 }
 
 ## bind final outputs -----------
-ALL_PARAM <- dplyr::bind_rows(PARAM_ROWS)
+Param_grouped_data <- dplyr::bind_rows(PARAM_ROWS)
 HC_ROWS <- lapply(HC_ROWS, function(x) {
   x$HC_se <- as.numeric(x$HC_se)
   x
 })
-ALL_HC    <- dplyr::bind_rows(HC_ROWS)
-ALL_DIAG  <- dplyr::bind_rows(DIAG_ROWS)
+HC_grouped_data    <- dplyr::bind_rows(HC_ROWS)
+Diag_grouped_data  <- dplyr::bind_rows(DIAG_ROWS)
 
 
 ## Output file -----
 
 writexl::write_xlsx(
   list(
-    "H"          = ALL_HC,
-    "Parameters" = ALL_PARAM,
-    "Diagonistic" = ALL_DIAG
+    "H"          = HC_grouped_data,
+    "Parameters" = Param_grouped_data,
+    "Diagonistic" = Diag_grouped_data
   ),
   path = paste0(here::here("DataProcessed"),"/Grouped data.xlsx")
 )
 
-save(ALL_HC, file = "DataProcessed/HC_Grouped data.rda")
-save(ALL_PARAM, file = "DataProcessed/Param_Grouped data.rda")
-save(ALL_DIAG, file = "DataProcessed/Diag_Grouped data.rda")
+save(HC_grouped_data, file = "DataProcessed/HC_grouped_data.rda")
+save(Param_grouped_data, file = "DataProcessed/Param_grouped_data.rda")
+save(Diag_grouped_data, file = "DataProcessed/Diag_grouped_data.rda")

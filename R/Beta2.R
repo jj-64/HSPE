@@ -1,5 +1,5 @@
 
-library(numDeriv)
+#library(numDeriv)
 
 # CDF_B2 ------
 #' @title CDF of the Beta Prime (Beta-2) Distribution

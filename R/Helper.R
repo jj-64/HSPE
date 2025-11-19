@@ -62,7 +62,7 @@
 #' )
 #'
 #' # Lognormal model only
-#' compute_headcounts(
+#' compute_headcounts_limited(
 #'   PL_vals,
 #'   models = "LN",
 #'   Average = 50,
@@ -70,7 +70,7 @@
 #' )
 #'
 #' # Fisk and NP models together
-#' compute_headcounts(
+#' compute_headcounts_limited(
 #'   PL_vals,
 #'   models = c("FISK", "NP"),
 #'   Fisk_scale = 2, Fisk_shape = 1.5,
@@ -78,18 +78,18 @@
 #' )
 #'
 #' # All three models
-#' compute_headcounts(
+#' compute_headcounts_limited(
 #'   PL_vals,
 #'   models = "all",
 #'   Average = 50, LN_sigma = 0.6,
 #'   Fisk_scale = 2, Fisk_shape = 1.5,
 #'   NP_alpha = 1.2, NP_beta = 0.8
 #' )
-#' compute_headcounts(PL_vals, models = "LN", Average = avg, LN_sigma = sigma)
-#' compute_headcounts(PL_vals, models = c("FISK", "NP"), Fisk_scale = a, Fisk_shape = b, NP_alpha = na, NP_beta = nb)
-#' compute_headcounts(PL_vals, models = "all", ...)
+#' compute_headcounts_limited(PL_vals, models = "LN", Average = avg, LN_sigma = sigma)
+#' compute_headcounts_limited(PL_vals, models = c("FISK", "NP"), Fisk_scale = a, Fisk_shape = b, NP_alpha = na, NP_beta = nb)
+#' compute_headcounts_limited(PL_vals, models = "all", ...)
 #' @export
-compute_headcounts <- function(
+compute_headcounts_limited <- function(
     PL_vals,
     models = c("all", "LN", "FISK", "NP"),
     Average = NULL,
@@ -126,7 +126,7 @@ compute_headcounts <- function(
 
     HC$FISK_H <- sapply(
       PL_vals$pl,
-      function(p) CDF_Fisk(y = p, scale = Fisk_scale, shape = Fisk_shape) * 100
+      function(p) CDF_FISK(y = p, scale = Fisk_scale, shape = Fisk_shape)
     )
   }
 
@@ -140,7 +140,7 @@ compute_headcounts <- function(
 
     HC$LN_H <- sapply(
       PL_vals$pl,
-      function(p) pnorm( (log(p / Average) / LN_sigma) + LN_sigma / 2 ) * 100
+      function(p) pnorm( (log(p / Average) / LN_sigma) + LN_sigma / 2 )
     )
   }
 
@@ -154,7 +154,7 @@ compute_headcounts <- function(
 
     HC$NP_H <- sapply(
       PL_vals$pl,
-      function(p) CDF_NP(shape = NP_shape, scale = NP_scale, q = p) * 100
+      function(p) CDF_NP(shape = NP_shape, scale = NP_scale, y = p)
     )
   }
 
@@ -241,7 +241,7 @@ NP_SE   = NA
 )
 }
 
-library(dplyr)
+#library(dplyr)
 ##Function to expand data according to HH weight vector -----------
 replicate_rows <- function(df) {
   df = df %>%

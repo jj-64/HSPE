@@ -1,6 +1,6 @@
 load("DataProcessed/SumData.rda")
 
-library(dplyr)
+#library(dplyr)
 #library(stringr)
 
 # -------------------------
@@ -21,8 +21,8 @@ for (i in seq_len(nrow(data))) {
   Country = data$Country[i]
 
   ## Extract PL values
-  #ci_lower_cols <- grep("CI_lower_", names(data), value = TRUE)
-  #ci_upper_cols <- grep("CI_upper_", names(data), value = TRUE)
+  ci_lower_cols <- grep("CI_lower_", names(data), value = TRUE)
+  ci_upper_cols <- grep("CI_upper_", names(data), value = TRUE)
   #thresholds <- as.numeric(stringr::str_extract(ci_lower_cols, "\\d+"))/100 ## get thresholds from the suffix
 
   ## Extract observed Headcount
@@ -35,25 +35,29 @@ for (i in seq_len(nrow(data))) {
   thresholds = get_observed_HC(data, Country)$threshold
 
   # --- Distribution parameters ---
+  fit <- fit_model_limited(dist = c("LN", "NP", "FISK"), mean_y = Average,
+                    Gini = Gini1,
+                    se_mean = se_Average,
+                    se_Gini = se_Gini1)
         ## Fisk
-  Fisk_shape  <- shape_Fisk(Gini1)
-  Fisk_scale  <- scale_Fisk(shape = Fisk_shape, mean_y = Average)
+  Fisk_shape  <- fit$FISK$par["shape"]
+  Fisk_scale  <- fit$FISK$par["scale"]
         ##LN
-  LN_sigma <- Sigma_LN(Gini1)
-  LN_mu    <- mu_LN(mean_y = Average, LN_sigma)
+  LN_sigma <- fit$LN$par["sigma"]
+  LN_mu    <- fit$LN$par["mu"]
         ##NP
-  NP_shape <- shape_NP(Gini1)
-  NP_scale <- scale_NP(mean_y = Average, shape = NP_shape)
+  NP_shape <- fit$NP$par["shape"]
+  NP_scale <- fit$NP$par["scale"]
 
   # --- Poverty lines ---
   PL_vals <- list(
     ratio = thresholds,
     pl  = thresholds * Average,
-    obs = HC_obs * 100
+    obs = HC_obs
   )
 
   # --- Compute headcounts ---
-  SUM_H <- compute_headcounts(PL_vals = PL_vals,
+  SUM_H <- compute_headcounts_limited(PL_vals = PL_vals,
                               models = c("all"), # "LN", "FISK", "NP"
                               Average = Average,
                               Fisk_scale = Fisk_scale,
@@ -66,20 +70,21 @@ for (i in seq_len(nrow(data))) {
   ## Standard Errors for Estimated Parameters
       ## Fisk
   if(!is.na(se_Gini1) & !is.na(se_Average)){
-    se_Fisk_shape = se_shape_Fisk(Gini1, se_Gini1)
-    se_Fisk_scale = se_scale_Fisk(mean_y = Average, Gini = Gini1, se_mean = se_Average, se_Gini = se_Gini1, shape_Fisk = Fisk_shape)
-        ## LN
-    se_LN_sigma = se_sigma_LN(Average, Gini1,  se_Gini1)
-    se_LN_mu = se_mu_LN(Average, Gini1, se_Average, se_Gini1)
+    se_Fisk_shape = fit$FISK$se["se_shape"]
+    se_Fisk_scale = fit$FISK$se["se_scale"]
+    ## LN
+    se_LN_sigma = fit$LN$se["se_sigma"]
+    se_LN_mu = fit$LN$se["se_mu"]
         ## NP
-    se_NP_shape = se_shape_NP(Gini1, se_Gini1, shape = NP_shape)
-    se_NP_scale = se_scale_NP(mean_y = Average, Gini = Gini1, se_mean = se_Average, se_Gini1, shape=NP_shape, se_shape = se_NP_shape, scale= NP_scale)
+    se_NP_shape = fit$NP$se["se_shape"]
+    se_NP_scale = fit$NP$se["se_scale"]
 
   } else{
     se_Fisk_scale =NA; se_Fisk_shape=NA; se_LN_mu=NA; se_LN_sigma=NA; se_NP_shape=NA; se_NP_scale=NA
   }
 
   # --- Compute parameter summary ---
+
   SUM_Param <- compute_param_summary(Fisk_scale = Fisk_scale, Fisk_shape = Fisk_shape,
                                          LN_mu = LN_mu, LN_sigma = LN_sigma,
                                          NP_shape = NP_shape, NP_scale = NP_scale,
@@ -90,16 +95,18 @@ for (i in seq_len(nrow(data))) {
   SUM_Param$Country <- data$Country[i]
 
   # --- Compute Hedacount standard error ----
+  if(!is.na(se_Gini1) & !is.na(se_Average)){
   FISK_SE <- sapply(
     PL_vals$pl,
-    function(x) HC_se_Fisk (
-      x = x,
+    function(x) HC_se_FISK (
+      y = x,
       scale = Fisk_scale,
       shape = Fisk_shape,
       se_scale = se_Fisk_scale,
       se_shape = se_Fisk_shape
-    ) * 100     # since HC is scaled to percent
+    )
   )
+  SUM_H$"FISK_H_SE" = as.numeric(FISK_SE)
   SUM_CI_Fisk = conf_bound(SUM_H[,"FISK_H"],FISK_SE)
   colnames(SUM_CI_Fisk) = paste0("FISK_H_",c("lower", "upper"))
 
@@ -112,27 +119,30 @@ for (i in seq_len(nrow(data))) {
                 se_sigma = se_LN_sigma,
                 cov_mu_sigma = 0)
   )
+  SUM_H$"LN_H_SE" = as.numeric(LN_SE)
   SUM_CI_LN = conf_bound(SUM_H[,"LN_H"],LN_SE)
   colnames(SUM_CI_LN) = paste0("LN_H_",c("lower", "upper"))
 
   NP_SE <- sapply(
     PL_vals$pl,
-    function(x) HC_se_Fisk (
-      x = x,
+    function(x) HC_se_NP (
+      y = x,
       scale = NP_scale,
       shape = NP_shape,
       se_scale = se_NP_scale,
       se_shape = se_NP_shape
-    ) * 100     # since HC is scaled to percent
+    )
   )
+  SUM_H$"NP_H_SE" = as.numeric(NP_SE)
   SUM_CI_NP = conf_bound(SUM_H[,"NP_H"],NP_SE)
   colnames(SUM_CI_NP) = paste0("NP_H_",c("lower", "upper"))
 
   OBS_CI <- data.frame(
     threshold = thresholds,
-    CI_lower = as.numeric(data[i, ci_lower_cols])*100,
-    CI_upper = as.numeric(data[i, ci_upper_cols])*100
+    CI_lower = as.numeric(data[i, ci_lower_cols]),
+    CI_upper = as.numeric(data[i, ci_upper_cols])
   )
+  }
 
   # Store results
   combined_HC[[i]]  <- SUM_H
@@ -148,21 +158,21 @@ for (i in seq_len(nrow(data))) {
 }
 
 # --- Combine all results ---
-combined_HC_df  <- bind_rows(combined_HC)
-combined_Param_df <- bind_rows(combined_Param)
-combined_CI_df <- bind_rows(combined_CI)
+HC_limited_data  <- dplyr::bind_rows(combined_HC)
+Param_limited_data <- dplyr::bind_rows(combined_Param)
+CI_limited_data <- dplyr::bind_rows(combined_CI)
 
 ## --- Output file ---
 
 writexl::write_xlsx(
   list(
-    "H"          = combined_HC_df,
-    "Parameters" = combined_Param_df,
-    "CI" = combined_CI_df
+    "H"          = HC_limited_data,
+    "Parameters" = Param_limited_data,
+    "CI" = CI_limited_data
   ),
-  path = paste0(here::here("DataProcessed"),"/2Param.xlsx")
+  path = paste0(here::here("DataProcessed"),"/Limited data.xlsx")
 )
 
-save(combined_HC_df, file = "DataProcessed/HC_TwoParam.rda")
-save(combined_Param_df, file = "DataProcessed/Param_TwoParam.rda")
-save(combined_CI_df, file = "DataProcessed/CI_TwoParam.rda")
+save(HC_limited_data, file = "DataProcessed/HC_limited_data.rda")
+save(Param_limited_data, file = "DataProcessed/Param_limited_data.rda")
+save(CI_limited_data, file = "DataProcessed/CI_limited_data.rda")

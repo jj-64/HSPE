@@ -9,7 +9,7 @@ Lorenz_NP(
   shape,
   n_grid = 3000,
   cluster_power = 3,
-  eps = 0.000000000001
+  eps = 1e-12
 )
 }
 \arguments{
