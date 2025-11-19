@@ -1,3 +1,13 @@
+library("fitdistrplus")
+
+fitdagum <-function(y){
+ddagum  <-function(x,a, b, c) VGAM::ddagum(x, scale= b, shape1.a = a, shape2.p = c)
+pdagum<-  function(q,a, b, c) VGAM::pdagum(q, scale= b, shape1.a = a, shape2.p = c)
+qdagum <-  function(p,a, b, c) VGAM::qdagum(p, scale= b, shape1.a = a, shape2.p = c)
+
+ return(fitdistrplus::fitdist(y, "dagum", start=list(a=2, b=1000, c=2)))
+}
+
 # Helper: Fit a grouped model -----------------------------
 fit_model_micro <- function(model =c("DA","SM","B2","GB2","FISK","LN","NP"), L_nonCum, mean_y, Gini, N) {
 
