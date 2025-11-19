@@ -2,19 +2,28 @@ CDF_DA <- function(y, a, b, p)
   { (1 + (y / b)^(-a))^(-p) }
 #VGAM::pdagum(q=y, shape1.a = a, shap2.p = p, scale=b)
 
-HC_se_DA <- function(pov_line, a, b, p, se_a, se_b, se_p) {
-  # pov_line: poverty line(s)
+Lorenz_DA <- function(u = seq(0.1, 1, by =0.1), a, b, p) {
+  # u is between o and 1
+  x  <- u^(1/p)
+  num <- pbeta(x, p + 1/a, 1 - 1/a)
+  den <- beta(p, 1 - 1/a)
+  L <- num / den
+  return(L)
+}
+
+HC_se_DA <- function(y, a, b, p, se_a, se_b, se_p) {
+  # y: poverty line(s)
   # a, b, p: Dagum parameters
   # vcov: 3x3 variance–covariance matrix from fitgroup.da
 
-  pov_line <- as.numeric(pov_line)
+  y <- as.numeric(y)
 
   # compute u and F (CDF)
-  u <- (pov_line / b)^(-a)
+  u <- (y / b)^(-a)
   Fval <- (1 + u)^(-1 / p)
 
   # partial derivatives
-  dF_da <- Fval * (u / (p * (1 + u))) * log(pov_line / b)
+  dF_da <- Fval * (u / (p * (1 + u))) * log(y / b)
   dF_db <- Fval * (a / (p * b)) * (u / (1 + u))
   dF_dp <- Fval * (log(1 + u) / p^2)
 
