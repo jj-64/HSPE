@@ -246,7 +246,7 @@ CDF_registry <- list(
   # 7. BETA PRIME (Beta-2)
   # ---------------------------------------------------------
   B2 = list(
-    params = c("p","q"),
+    params = c("b","p","q"),
 
     fitfun = "fitgroup.b2",
 
