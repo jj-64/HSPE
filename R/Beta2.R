@@ -11,6 +11,14 @@ CDF_B2 <- function(y, b, p , q) {
   pbeta(z, p, q)
 }
 
+Lorenz_B2 <- function(u, b, p, q) {
+  x <- qbeta(u, p, q)
+  num <- pbeta(x, p + 1, q - 1)
+  den <- beta(p, q)
+  L <- num / den
+  return(L)
+}
+
 # Delta-method SE for Beta-2 headcount using numerical gradient
 HC_se_B2 <- function(y, b, p, q, se_b, se_p, se_q,
                      eps = 1e-6) {
