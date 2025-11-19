@@ -6,6 +6,15 @@ CDF_GB2 <- function(y, a, b, p ,q){
   pbeta(u, p, q)
 }
 
+Lorenz_GB2 <- function(u, a, b, p, q) {
+  # u in [0,1]
+  x <- qbeta(u, p, q)
+  num <- pbeta(x, p + 1/a, q - 1/a)
+  den <- beta(p, q)
+  L <- num / den
+  return(L)
+}
+
 # ---- Gradient of CDF wrt parameters (numerically) ----
 grad_CDF_GB2 <- function(y, a, b, p ,q, eps = 1e-6) {
   param <- c(a=a, b=b, p=p, q=q)
