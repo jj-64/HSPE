@@ -22,7 +22,7 @@ for(i in seq_along(data)){
 
   ## Extract observed Headcount
   observed_HC <- get_observed_HC(data, Country)  # threshold + observed_HC
-  thresholds <- observed_HC$threshold
+  thresholds <- observed_HC$threshold  ## ratio between zero and 1
 
   # Lorenz shares
   L_values = as.numeric(get_observed_deciles(data, Country))
@@ -45,6 +45,7 @@ for(i in seq_along(data)){
     models <- names(CDF_registry)
 
     SUM_Param <- data.frame(Parameter = unique(unlist(lapply(CDF_registry, `[[`, "params"))))
+    SUM_Param$Country = Country
 
     results = list()
 
@@ -52,7 +53,7 @@ for(i in seq_along(data)){
     for(model in models) {
 
       fit <- fit_model_grouped(model, L_nonCum, mean_y = Average,
-                               Gini = Gini1, N = N, nrep=1000)
+                               Gini = Gini1, N = N, nrep=10)
 
       if(!fit$ok){
         SUM_Param <- compute_param_summary2(SUM_Param, model, NA, NA)
@@ -68,17 +69,17 @@ for(i in seq_along(data)){
 
        ## Compute headcounts SE
       HCSE_fun <- get(CDF_registry[[model]]$HCsefun)
-      HC_SE <- HCSE_fun(PL_vals, as.list(fit$par), as.list(fit$se))
+      HC_SE <- #HCSE_fun(PL_vals, as.list(fit$par), as.list(fit$se))
+              sapply(PL_vals, function(z) HCSE_fun(z,as.list(fit$par), as.list(fit$se) ))
                }
 
       results[[model]] <- tibble::tibble(
         Country = Country,
         threshold = thresholds,
         model = model,
-        model_H = HC
+        HC = HC,
+        HC_SE = HC_SE
       )
-
-      SUM_Param$Country = Country
 
       }
 
