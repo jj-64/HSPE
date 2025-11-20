@@ -1,45 +1,79 @@
-#library("fitdistrplus")
 
-fitdagum <-function(y){
-ddagum  <-function(x,a, b, c) VGAM::ddagum(x, scale= b, shape1.a = a, shape2.p = c)
-pdagum<-  function(q,a, b, c) VGAM::pdagum(q, scale= b, shape1.a = a, shape2.p = c)
-qdagum <-  function(p,a, b, c) VGAM::qdagum(p, scale= b, shape1.a = a, shape2.p = c)
+## Create a wrapper that safely fits each model---------------
+## incomplete
+safe_fit <- function(y, distr, start = NULL, lower = -Inf, upper = Inf, max_trial = 100){
 
- return(fitdistrplus::fitdist(y, "dagum", start=list(a=2, b=1000, c=2)))
+  trial = 500
+
+  if(distr == "llogis"){dllogis = VGAM::dfisk; pllogis = VGAM::pfisk ; qllogis = VGAM::qfisk}
+  if(distr == "newpareto"){dnewpareto = pdf_NP; pnewpareto = CDF_NP; qnewpareto = Quantile_NP}
+
+  while (trial <= max_trial) {
+  out <- try(
+    fitdistrplus::fitdist(y, distr = distr, method = "mle",
+                          start = start, lower = lower, upper = upper),
+    silent = TRUE
+  )
+  if(inherits(out, "try-error")) {
+    start = lapply(start, function(x) x+0.1)
+    trial = trial -1 }
+
+                                  }
+  if(trial == max_trial) return(NULL)
+  out
 }
 
-# Helper: Fit a grouped model -----------------------------
-fit_model_micro <- function(model =c("DA","SM","B2","GB2","FISK","LN","NP"), L_nonCum, mean_y, Gini, N) {
+## Function that fits ALL models to one dataset--------------
+fit_models_micro <- function(y){
 
-  if (!all(model %in% c("DA","SM","B2","GB2","FISK","LN","NP"))) {
-    stop("models must be one of:  DA, SM, Beta2, GB2, FISK ,LN","NP")
+  Average <- mean(y)
+
+  fits <- list(
+    LN   = safe_fit(y, "lnorm"),
+    FISK = safe_fit(y, distr = "llogis",
+                    start = list(shape1.a = 1.5, scale = Average),
+                    lower = c(0.01, 0.01) ),   # VGAM name for Fisk
+    B2   = safe_fit(y, "beta2",
+                    start = list(p = 2, q = 2, b = Average),
+                    lower = c(0.01, 0.01, 0.01)),
+    NP   = safe_fit(y, distr = "newpareto",
+                    start = list(shape = 2, scale = Average),
+                    lower = c(0.01, min(y))  ),
+    GB2  = safe_fit(y, "gb2",
+                    start = list(shape1 = 2, shape2 = 2, shape3 = 1.5, scale = Average),
+                    lower = c(0.01, 0.01, 0.01, 0.01)),
+    DAGUM = safe_fit(y, "dagum",
+                     start = list(shape1 = 1.5, shape2 = 2.0, scale = Average),
+                     lower = c(0.01, 0.01, 0.01)),
+    SM = safe_fit(y, "sinmad",     # Singh-Maddala in VGAM
+                  start = list(shape1.a = 1, shape3.q = 1, scale = Average))
+  )
+  fits
+}
+
+## Extract parameter info from the fit_model_micro -------------
+extract_info <- function(fit, model, file){
+  if(is.null(fit)) {
+    return(tibble(
+      file, model,
+      status = "FAILED",
+      logLik = NA, AIC = NA, BIC = NA,
+      parameter = NA,
+      estimate = NA,
+      sd = NA
+    ))
   }
 
-  info <- CDF_registry[[model]]
-
-  fitfun <- get(info$fitmicro)
-
-  tryCatch({
-    fit <- fitfun(
-      y = L_nonCum,
-      pc.inc = mean_y,
-      gini.e = Gini,
-      gini = TRUE,
-      N = N,
-      se.ewmd = TRUE,
-      se.scale = TRUE,
-      nrep = 100
-    )
-
-    list(
-      ok = TRUE,
-      par = fit$ewmd.estimation["Coef.", info$params],
-      se  = fit$ewmd.estimation["se",   info$params],
-      gini_est = fit$gini.estimation[3]
-    )
-
-  }, error = function(e){
-    message(model, " FAILED: ", e$message)
-    return(list(ok = FALSE))
-  })
+  params <- names(fit$estimate)
+  tibble(
+    file,
+    model,
+    status = "OK",
+    logLik = as.numeric(logLik(fit)),
+    AIC = AIC(fit),
+    BIC = BIC(fit),
+    parameter = params,
+    estimate = fit$estimate,
+    sd = sqrt(diag(fit$vcov))
+  )
 }
