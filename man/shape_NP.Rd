@@ -20,6 +20,7 @@ by solving:
 \details{
 using derivative-free nonlinear optimization (COBYLA).
 
+
 The optimizer minimizes:
 \deqn{|G_NP(\alpha) - Gini|}
 

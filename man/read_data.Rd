@@ -8,17 +8,17 @@ read_data(indices = NA, variable = "dhi", raw = FALSE, country_filter = NULL)
 }
 \arguments{
 \item{indices}{Integer vector of file indices to read.
-If \code{NA} (default), all files are read unless \code{country_filter} is used.}
+If `NA` (default), all files are read unless `country_filter` is used.}
 
 \item{variable}{Character string.
-The variable name to extract from each dataset (default = \code{"dhi"} for income).}
+The variable name to extract from each dataset (default = `"dhi"` for income).}
 
 \item{raw}{Logical.
-If \code{TRUE}, household weights are used to expand each record (replicate rows).}
+If `TRUE`, household weights are used to expand each record (replicate rows).}
 
 \item{country_filter}{Character or NULL.
 A text pattern or vector of patterns used to select only files whose
-filenames contain these substrings (e.g., \code{"at97"}).
+filenames contain these substrings (e.g., `"at97"`).
 If multiple values: any matching file will be included.}
 }
 \value{

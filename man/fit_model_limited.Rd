@@ -25,10 +25,10 @@ fit_model_limited(
 }
 \value{
 A list with:
-\describe{
-\item{par}{c(shape, scale)}
-\item{se}{c(se_shape, se_scale)}
-}
+  \describe{
+    \item{par}{c(shape, scale)}
+    \item{se}{c(se_shape, se_scale)}
+  }
 }
 \description{
 Computes:

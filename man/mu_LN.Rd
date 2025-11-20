@@ -16,9 +16,9 @@ mu (meanlog)
 }
 \description{
 For a lognormal distribution:
-mean = exp(mu + sigma^2 / 2)
+  mean = exp(mu + sigma^2 / 2)
 so
-mu = log(mean) - sigma^2/2
+  mu = log(mean) - sigma^2/2
 }
 \examples{
 mu_LN(1000, 0.36)

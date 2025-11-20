@@ -31,19 +31,19 @@ compute_param_summary(
 \item{se_Fisk_alpha, se_Fisk_beta}{Numeric. Standard errors for the Fisk parameters.}
 
 \item{se_NP_alpha, se_NP_beta}{Numeric. Standard errors for New Pareto parameters.
-All SEs default to \code{NA} if not provided.}
+All SEs default to `NA` if not provided.}
 }
 \value{
 A data frame with two rows and columns for:
-\describe{
-\item{Parameter}{Labels: \code{"alpha / μ"} and \code{"beta / σ"}}
-\item{Fisk}{Estimated Fisk parameters}
-\item{Fisk_SE}{Standard errors for Fisk parameters}
-\item{LN}{Estimated Lognormal parameters}
-\item{LN_SE}{Standard errors for Lognormal parameters}
-\item{NP}{Estimated New Pareto parameters}
-\item{NP_SE}{Standard errors for NP parameters}
-}
+  \describe{
+    \item{Parameter}{Labels: `"alpha / μ"` and `"beta / σ"`}
+    \item{Fisk}{Estimated Fisk parameters}
+    \item{Fisk_SE}{Standard errors for Fisk parameters}
+    \item{LN}{Estimated Lognormal parameters}
+    \item{LN_SE}{Standard errors for Lognormal parameters}
+    \item{NP}{Estimated New Pareto parameters}
+    \item{NP_SE}{Standard errors for NP parameters}
+  }
 }
 \description{
 This function creates a compact summary table containing the estimated
@@ -53,10 +53,10 @@ Fisk, Lognormal, and New Pareto.
 \details{
 The function outputs a two-row table:
 \itemize{
-\item Row 1 contains the first parameter for each model
-(Fisk \eqn{\alpha}, Lognormal \eqn{\mu}, NP \eqn{\alpha})
-\item Row 2 contains the second parameter for each model
-(Fisk \eqn{\beta}, Lognormal \eqn{\sigma}, NP \eqn{\beta})
+  \item Row 1 contains the first parameter for each model
+        (Fisk \eqn{\alpha}, Lognormal \eqn{\mu}, NP \eqn{\alpha})
+  \item Row 2 contains the second parameter for each model
+        (Fisk \eqn{\beta}, Lognormal \eqn{\sigma}, NP \eqn{\beta})
 }
 }
 \examples{
