@@ -1,12 +1,11 @@
 Package: HSPE
+Type: Package
 Title: Household Survey Parameter Estimation
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: 
     person("Jinane", "Jouni", , "jinane.jouni@hotmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0007-7150-9065"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Description: fit distribution using mutiple data availability (limited, grouped and microdata)
+License: MIT
 Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.1.1
