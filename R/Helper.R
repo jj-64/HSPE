@@ -154,7 +154,7 @@ compute_headcounts_limited <- function(
 
     HC$NP_H <- sapply(
       PL_vals$pl,
-      function(p) CDF_NP(shape = NP_shape, scale = NP_scale, y = p)
+      function(p) CDF_NP(p, shape = NP_shape, scale = NP_scale)
     )
   }
 
