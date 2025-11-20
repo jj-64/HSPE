@@ -4,10 +4,10 @@
 \alias{CDF_NP}
 \title{New Pareto CDF}
 \usage{
-CDF_NP(y, shape, scale)
+CDF_NP(q, shape, scale)
 }
 \arguments{
-\item{y}{Quantile/income.}
+\item{q}{Quantile/income.}
 
 \item{shape}{Shape parameter.}
 

@@ -25,7 +25,7 @@ HC_se_DA(y, a, b, p, se_a, se_b, se_p)
 Numeric vector of standard errors, same length as \code{y}.
 }
 \description{
-Computes \strong{delta-method standard errors} for headcount poverty indices
+Computes **delta-method standard errors** for headcount poverty indices
 using the Dagum CDF:
 
 \deqn{
@@ -46,12 +46,10 @@ The delta-method approximation is:
 with parameters \eqn{\theta = (a, b, p)}.
 }
 \details{
-\itemize{
-\item This implementation assumes \strong{independent parameter estimates}
-(diagonal covariance matrix).
-\item If a full vcov matrix is available, the function can be extended easily.
-\item Computes the analytical gradient of the Dagum CDF wrt \eqn{a,b,p}.
-}
+- This implementation assumes **independent parameter estimates**
+  (diagonal covariance matrix).
+- If a full vcov matrix is available, the function can be extended easily.
+- Computes the analytical gradient of the Dagum CDF wrt \eqn{a,b,p}.
 }
 \examples{
 y <- c(1, 2, 3)

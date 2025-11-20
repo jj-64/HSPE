@@ -35,11 +35,11 @@ fit_FISK(
 \value{
 A list:
 \describe{
-\item{par}{c(shape, scale)}
-\item{value}{Loss function value}
-\item{convergence}{0 = ok}
-\item{gini}{Model-implied Gini}
-\item{mean}{Model-implied mean}
+  \item{par}{c(shape, scale)}
+  \item{value}{Loss function value}
+  \item{convergence}{0 = ok}
+  \item{gini}{Model-implied Gini}
+  \item{mean}{Model-implied mean}
 }
 }
 \description{

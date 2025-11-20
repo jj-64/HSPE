@@ -19,12 +19,12 @@ compute_headcounts_limited(
 \item{PL_vals}{A data frame containing poverty lines and observed
 headcounts. Must include:
 \describe{
-\item{pl}{Numeric vector of poverty lines.}
-\item{obs}{Observed headcounts associated with each poverty line.}
+  \item{pl}{Numeric vector of poverty lines.}
+  \item{obs}{Observed headcounts associated with each poverty line.}
 }}
 
 \item{models}{Character vector specifying which models to compute.
-Options are \code{"LN"}, \code{"FISK"}, \code{"NP"}, or \code{"all"} (default).
+Options are `"LN"`, `"FISK"`, `"NP"`, or `"all"` (default).
 The matching is case-insensitive.}
 
 \item{Average}{Numeric. Mean income parameter required for the
@@ -41,31 +41,32 @@ distribution.}
 }
 \value{
 A data frame with:
-\describe{
-\item{Observed}{Observed headcounts from \code{PL_vals}.}
-\item{FISK_H}{Headcount from the Fisk model (if requested).}
-\item{LN_H}{Headcount from the Lognormal model (if requested).}
-\item{NP_H}{Headcount from the New Pareto model (if requested).}
-}
-Row names correspond to the poverty lines in \code{PL_vals$pl}.
+  \describe{
+    \item{Observed}{Observed headcounts from `PL_vals`.}
+    \item{FISK_H}{Headcount from the Fisk model (if requested).}
+    \item{LN_H}{Headcount from the Lognormal model (if requested).}
+    \item{NP_H}{Headcount from the New Pareto model (if requested).}
+  }
+  Row names correspond to the poverty lines in `PL_vals$pl`.
 }
 \description{
 This function computes poverty headcount ratios for one or more
 parametric income distributions (Lognormal, Fisk, and New Pareto).
 It evaluates the cumulative distribution function (CDF) at each
-poverty line provided in \code{PL_vals} and returns model-specific
+poverty line provided in `PL_vals` and returns model-specific
 headcounts (in percent) alongside the observed headcount.
 }
 \details{
-Users may specify which models to compute using the \code{models} argument.
+Users may specify which models to compute using the `models` argument.
 Required distribution parameters must be provided only for the
 requested models.
 
-For each poverty line \code{p}, the function computes:
+
+For each poverty line `p`, the function computes:
 \itemize{
-\item \strong{FISK:} \eqn{F(p | \alpha, \beta)}
-\item \strong{LN:} \eqn{ \Phi( ( \log(p/Average) / \sigma ) + \sigma/2 ) }
-\item \strong{NP:} \eqn{F_{\text{NP}}(p | \alpha, \beta)}
+  \item \strong{FISK:} \eqn{F(p | \alpha, \beta)}
+  \item \strong{LN:} \eqn{ \Phi( ( \log(p/Average) / \sigma ) + \sigma/2 ) }
+  \item \strong{NP:} \eqn{F_{\text{NP}}(p | \alpha, \beta)}
 }
 
 Required parameters depend on the selected models.

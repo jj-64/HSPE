@@ -19,8 +19,8 @@ CDF_B2(y, b, p, q)
 Numeric vector of CDF values.
 }
 \description{
-Computes the cumulative distribution function (CDF) of a \strong{Beta Prime
-(Beta-2)} distribution:
+Computes the cumulative distribution function (CDF) of a **Beta Prime
+(Beta-2)** distribution:
 
 \deqn{F(y \mid p, q, b) = I_{\,y/(b+y)}(p, q)}
 

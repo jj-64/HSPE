@@ -31,10 +31,8 @@ With gradient \eqn{\nabla_\theta H} and parameter covariance \eqn{\Sigma}:
 }
 }
 \details{
-\itemize{
-\item Assumes independence of parameter estimates (diagonal covariance).
-\item Uses numerical gradient from \code{grad_CDF_GB2()}.
-}
+- Assumes independence of parameter estimates (diagonal covariance).
+- Uses numerical gradient from \code{grad_CDF_GB2()}.
 }
 \examples{
 HC_se_GB2(

@@ -14,7 +14,7 @@ The lognormal sigma.
 }
 \description{
 Computes the lognormal sigma parameter from the Gini coefficient using:
-sigma = sqrt(2) * qnorm((1 + Gini)/2)
+  sigma = sqrt(2) * qnorm((1 + Gini)/2)
 }
 \examples{
 Sigma_LN(0.36)

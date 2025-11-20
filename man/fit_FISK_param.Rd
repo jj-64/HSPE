@@ -17,15 +17,15 @@ fit_FISK_param(mean_y, Gini, se_mean = NA, se_Gini = NA)
 }
 \value{
 A list with:
-\describe{
-\item{par}{Named vector: c(shape, scale)}
-\item{se}{Named vector: c(se_shape, se_scale)}
-}
+  \describe{
+    \item{par}{Named vector: c(shape, scale)}
+    \item{se}{Named vector: c(se_shape, se_scale)}
+  }
 }
 \description{
 Computes the Fisk (log-logistic) parameters using moment-matching:
-shape = 1/Gini
-scale = mean / \link{Gamma(1+1/shape) * Gamma(1-1/shape)}
+  shape = 1/Gini
+  scale = mean / [Gamma(1+1/shape) * Gamma(1-1/shape)]
 }
 \details{
 Optionally propagates standard errors using the delta method.

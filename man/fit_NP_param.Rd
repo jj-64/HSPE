@@ -17,10 +17,10 @@ fit_NP_param(mean_y, Gini, se_mean = NA, se_Gini = NA)
 }
 \value{
 A list with:
-\describe{
-\item{par}{c(shape, scale)}
-\item{se}{c(se_shape, se_scale)}
-}
+  \describe{
+    \item{par}{c(shape, scale)}
+    \item{se}{c(se_shape, se_scale)}
+  }
 }
 \description{
 Computes:
@@ -29,7 +29,7 @@ scale  as in \code{\link{scale_NP}}
 }
 \details{
 Optionally computes delta-method standard errors as in
-\code{\link{se_shape_NP}} and  \code{\link{se_scale_NP}}
+ \code{\link{se_shape_NP}} and  \code{\link{se_scale_NP}}
 }
 \examples{
 fit_NP_param(6000, 0.36, se_mean = 250, se_Gini = 0.01)

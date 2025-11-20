@@ -13,7 +13,7 @@ Lorenz_NP(
 )
 }
 \arguments{
-\item{p}{Probabilities in \link{0,1}.}
+\item{p}{Probabilities in [0,1].}
 
 \item{shape}{Shape parameter.}
 
@@ -26,7 +26,7 @@ Lorenz curve values.
 }
 \description{
 Approximates:
-L(p) = ∫₀ᵖ ∫₀ᵗ ((1+u)/(1-u))^(1/shape) du dt / denom
+  L(p) = ∫₀ᵖ ∫₀ᵗ ((1+u)/(1-u))^(1/shape) du dt / denom
 }
 \examples{
 Lorenz_NP(shape=3)

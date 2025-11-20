@@ -17,15 +17,15 @@ fit_LN_param(mean_y, Gini, se_mean = NA, se_Gini = NA)
 }
 \value{
 A list with:
-\describe{
-\item{par}{c(mu, sigma)}
-\item{se}{c(se_mu, se_sigma)}
-}
+  \describe{
+    \item{par}{c(mu, sigma)}
+    \item{se}{c(se_mu, se_sigma)}
+  }
 }
 \description{
 Computes:
-sigma = sqrt(2) * qnorm((1+Gini)/2)
-mu    = log(mean) - sigma^2/2
+  sigma = sqrt(2) * qnorm((1+Gini)/2)
+  mu    = log(mean) - sigma^2/2
 }
 \details{
 Optionally computes delta-method standard errors.

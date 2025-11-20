@@ -15,7 +15,7 @@ fit_model_grouped(
 }
 \arguments{
 \item{model}{Character scalar. One of:
-\code{"DA"}, \code{"SM"}, \code{"B2"}, \code{"GB2"}, \code{"FISK"}, \code{"LN"}, \code{"NP"}.}
+`"DA"`, `"SM"`, `"B2"`, `"GB2"`, `"FISK"`, `"LN"`, `"NP"`.}
 
 \item{L_nonCum}{Numeric vector of non-cumulative income shares
 (e.g., decile shares).}
@@ -28,12 +28,12 @@ fit_model_grouped(
 }
 \value{
 A list with elements:
-\describe{
-\item{ok}{Logical indicating success.}
-\item{par}{Named vector of parameter estimates (if successful).}
-\item{se}{Standard errors corresponding to \code{par}.}
-\item{gini_est}{Model-implied Gini estimate.}
-}
+  \describe{
+    \item{ok}{Logical indicating success.}
+    \item{par}{Named vector of parameter estimates (if successful).}
+    \item{se}{Standard errors corresponding to `par`.}
+    \item{gini_est}{Model-implied Gini estimate.}
+  }
 }
 \description{
 This function provides a unified wrapper to fit one of several
@@ -43,7 +43,7 @@ and Gini index.
 }
 \details{
 The function looks up the corresponding fitting routine from
-\code{CDF_registry}, executes it, and returns parameter estimates
+`CDF_registry`, executes it, and returns parameter estimates
 together with their standard errors.
 }
 \examples{

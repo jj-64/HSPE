@@ -27,8 +27,8 @@ HC_se_B2(y, b, p, q, se_b, se_p, se_q, eps = 1e-06)
 A numeric vector of standard errors (same length as \code{y}).
 }
 \description{
-Computes \strong{delta-method standard errors} for poverty headcount measures
-based on the CDF of the \strong{Beta-2 (Beta Prime)} distribution.
+Computes **delta-method standard errors** for poverty headcount measures
+based on the CDF of the **Beta-2 (Beta Prime)** distribution.
 
 For a poverty line \eqn{z}, the headcount is:
 
@@ -46,11 +46,9 @@ where \eqn{\theta = (p, q, b)}.
 }
 \details{
 The function:
-\itemize{
-\item constructs a diagonal covariance matrix if only SEs are provided
-\item uses Richardson numerical differentiation
-\item returns one SE per poverty line
-}
+- constructs a diagonal covariance matrix if only SEs are provided
+- uses Richardson numerical differentiation
+- returns one SE per poverty line
 }
 \examples{
 y <- c(1, 2, 3)

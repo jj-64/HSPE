@@ -19,7 +19,7 @@ Lorenz_B2(u, b, p, q)
 Numeric vector of Lorenz curve values.
 }
 \description{
-Computes the Lorenz curve for the \strong{Beta-2 (Beta Prime)} distribution.
+Computes the Lorenz curve for the **Beta-2 (Beta Prime)** distribution.
 
 The Lorenz curve is:
 
@@ -28,11 +28,9 @@ L(u) = \frac{ B\!\left( Q(u; p, q);\, p+1,\, q-1 \right) }{ B(p, q) }
 }
 
 where:
-\itemize{
-\item \eqn{Q(u)} is the quantile function (inverse CDF)
-\item \eqn{B(\cdot,\cdot)} is the beta function
-\item \eqn{u \in (0,1)}
-}
+- \eqn{Q(u)} is the quantile function (inverse CDF)
+- \eqn{B(\cdot,\cdot)} is the beta function
+- \eqn{u \in (0,1)}
 }
 \examples{
 u <- seq(0.01, 0.99, length.out = 5)

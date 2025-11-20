@@ -16,13 +16,13 @@ The confidence level.}
 }
 \value{
 A data.frame with two columns:
-- lower: lower confidence bound
-- upper: upper confidence bound
+        - lower: lower confidence bound
+        - upper: upper confidence bound
 }
 \description{
 This function computes a two-sided (lower/upper) confidence interval
-for an estimate \code{x} given its standard error \code{se}. It supports vectorized
-inputs, meaning \code{x} and \code{se} can be numeric vectors of the same length.
+for an estimate `x` given its standard error `se`. It supports vectorized
+inputs, meaning `x` and `se` can be numeric vectors of the same length.
 }
 \examples{
 conf_bound(0.5, 0.1)

@@ -7,7 +7,7 @@
 Lorenz_LN(p = seq(0.1, 1, 0.1), Gini)
 }
 \arguments{
-\item{P}{Quantiles in \link{0,1}}
+\item{P}{Quantiles in [0,1]}
 
 \item{sigma}{numerical value, lognormal scale positive parameter}
 }
