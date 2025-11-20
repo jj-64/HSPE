@@ -415,7 +415,7 @@ pdf_NP <- function(y, shape, scale) {
 ## CDF of NewPareto ----------------
 #' New Pareto CDF
 #'
-#' @param y Quantile/income.
+#' @param q Quantile/income.
 #' @param shape Shape parameter.
 #' @param scale Scale parameter.
 #'
@@ -424,12 +424,12 @@ pdf_NP <- function(y, shape, scale) {
 #' @examples
 #' CDF_NP(2000, shape= 2, scale=100)
 #' #[1] 0.9950125
-CDF_NP <- function(y, shape, scale) {
-  y <- as.numeric(y)
+CDF_NP <- function(q, shape, scale) {
+  q <- as.numeric(q)
   ifelse(
-    y < scale,
+    q < scale,
     0,
-    1 - 2 / (1 + (y/scale)^shape)
+    1 - 2 / (1 + (q/scale)^shape)
   )
 }
 
@@ -447,7 +447,7 @@ CDF_NP <- function(y, shape, scale) {
 #' #[1] 122.4745
 Quantile_NP <- function(p, shape, scale) {
   if(p <=0 | p>=1) stop("p shoule be between 0 and 1")
-  # p in (0,1). Solve 1 - 2/(1+(q/scale)^shape) = p => q = scale * ((2/(1-p)-1)^(1/shape))
+  # p in (0,1). Solve 1 - 2/(1+(p/scale)^shape) = p => q = scale * ((2/(1-p)-1)^(1/shape))
   if (any(p >= 1 | p <= 0)) stop("p must be in (0,1)")
   scale * ((2 / (1 - p) - 1)^(1 / shape))
 }
