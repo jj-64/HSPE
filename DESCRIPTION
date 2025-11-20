@@ -8,4 +8,4 @@ Authors@R:
 Description: fit distribution using mutiple data availability (limited, grouped and microdata)
 License: MIT
 Encoding: UTF-8
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.2
