@@ -124,12 +124,13 @@ HC_se_DA <- function(y, a, b, p, se_a, se_b, se_p) {
 
   # compute u and F (CDF)
   u <- (y / b)^(-a)
-  Fval <- (1 + u)^(-1 / p)
+  w <- 1 + 1/u  ## 1+ (y/b)^a
+  Fval <- (1 + u)^(-p)
 
   # partial derivatives
-  dF_da <- Fval * (u / (p * (1 + u))) * log(y / b)
-  dF_db <- Fval * (a / (p * b)) * (u / (1 + u))
-  dF_dp <- Fval * (log(1 + u) / p^2)
+  dF_da <- Fval * p * log(y / b) / w #(u / (p * (1 + u)))
+  dF_db <- Fval * (- a * p / b) / w #(a / (p * b)) * (u / (1 + u))
+  dF_dp <- Fval * - log(w)
 
   # gradient matrix: each row corresponds to one y
   G <- cbind(dF_da, dF_db, dF_dp)
