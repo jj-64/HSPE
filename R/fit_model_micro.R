@@ -1,25 +1,14 @@
 
 ## Create a wrapper that safely fits each model---------------
 ## incomplete
-safe_fit <- function(y, distr, start = NULL, lower = -Inf, upper = Inf, max_trial = 100){
+safe_fit <- function(y, distr, start = NULL, lower = -Inf, upper = Inf){
 
-  trial = 500
-
-  if(distr == "llogis"){dllogis = VGAM::dfisk; pllogis = VGAM::pfisk ; qllogis = VGAM::qfisk}
-  if(distr == "newpareto"){dnewpareto = pdf_NP; pnewpareto = CDF_NP; qnewpareto = Quantile_NP}
-
-  while (trial <= max_trial) {
   out <- try(
     fitdistrplus::fitdist(y, distr = distr, method = "mle",
                           start = start, lower = lower, upper = upper),
     silent = TRUE
-  )
-  if(inherits(out, "try-error")) {
-    start = lapply(start, function(x) x+0.1)
-    trial = trial -1 }
-
-                                  }
-  if(trial == max_trial) return(NULL)
+)
+  if(inherits(out, "try-error")) return(NULL)
   out
 }
 
@@ -28,23 +17,30 @@ fit_models_micro <- function(y){
 
   Average <- mean(y)
 
+  y <- y[y>0]
+
   fits <- list(
-    LN   = safe_fit(y, "lnorm"),
+    LN   = safe_fit(y, distr = "lnorm")
+    ,
     FISK = safe_fit(y, distr = "llogis",
-                    start = list(shape1.a = 1.5, scale = Average),
-                    lower = c(0.01, 0.01) ),   # VGAM name for Fisk
-    B2   = safe_fit(y, "beta2",
-                    start = list(p = 2, q = 2, b = Average),
-                    lower = c(0.01, 0.01, 0.01)),
+                    start = list(shape1.a = 1, scale = Average))
+                    ,   # VGAM name for Fisk
+    B2   = safe_fit(y, "b2",
+                    start = list(shape1 = 1, shape2=1, scale = Average),
+                    lower = c(0.01, 0.01, 0.01))
+                    ,
     NP   = safe_fit(y, distr = "newpareto",
-                    start = list(shape = 2, scale = Average),
-                    lower = c(0.01, min(y))  ),
+                    start = list(shape = 0.1, scale = Average),
+                    lower = c(0.01, min(y))  )
+    ,
     GB2  = safe_fit(y, "gb2",
                     start = list(shape1 = 2, shape2 = 2, shape3 = 1.5, scale = Average),
-                    lower = c(0.01, 0.01, 0.01, 0.01)),
-    DAGUM = safe_fit(y, "dagum",
-                     start = list(shape1 = 1.5, shape2 = 2.0, scale = Average),
-                     lower = c(0.01, 0.01, 0.01)),
+                    lower = c(0.01, 0.01, 0.01, 0.01))
+    ,
+    DA = safe_fit(y, distr= "dagum",
+                     start = list(shape1.a = 1.5, shape2.p = 2.0, scale = Average),
+                     lower = c(0.01, 0.01, 0.01))
+    ,
     SM = safe_fit(y, "sinmad",     # Singh-Maddala in VGAM
                   start = list(shape1.a = 1, shape3.q = 1, scale = Average))
   )
@@ -57,7 +53,7 @@ extract_info <- function(fit, model, file){
     return(tibble(
       file, model,
       status = "FAILED",
-      logLik = NA, AIC = NA, BIC = NA,
+      logLik = NA, #AIC = NA, BIC = NA,
       parameter = NA,
       estimate = NA,
       sd = NA
@@ -70,8 +66,8 @@ extract_info <- function(fit, model, file){
     model,
     status = "OK",
     logLik = as.numeric(logLik(fit)),
-    AIC = AIC(fit),
-    BIC = BIC(fit),
+    #AIC = AIC(fit),
+    #BIC = BIC(fit),
     parameter = params,
     estimate = fit$estimate,
     sd = sqrt(diag(fit$vcov))
