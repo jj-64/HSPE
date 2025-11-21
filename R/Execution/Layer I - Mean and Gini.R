@@ -1,4 +1,4 @@
-load("DataProcessed/SumData.rda")
+load("Data/DataProcessed/SumData.rda")
 
 #library(dplyr)
 #library(stringr)
