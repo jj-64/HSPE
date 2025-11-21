@@ -30,6 +30,35 @@ CDF_B2 <- function(y, b, p, q) {
   pbeta(z, p, q)
 }
 
+#library(numDeriv)
+
+# pdf_B2 ------
+#' @title pdf of the Beta Prime (Beta-2) Distribution
+#'
+#' @description
+#' Computes the density function of a **Beta Prime
+#' (Beta-2)** distribution:
+#'
+#' \deqn{p(y \mid p, q, b) = I_{\,y/(b+y)}(p, q)}
+#'
+#'
+#' where \eqn{I_z(p,q)} is the regularized incomplete beta function.
+#'
+#' @param y Numeric vector of evaluation points.
+#' @param b Scale parameter \eqn{b > 0}.
+#' @param p First shape parameter \eqn{p > 0}.
+#' @param q Second shape parameter \eqn{q > 0}.
+#'
+#' @return Numeric vector of CDF values.
+#'
+#' @examples
+#' pdf_B2(y = 1:5, b = 2, p = 3, q = 4)
+#'
+#' @export
+pdf_B2 <- function(y, b, p, q) {
+(y/b)^(p-1) / (1+y/b)^(p+q) / (b*beta(p,q))
+}
+
 ## Lorenz -------------------
 #' @title Lorenz Curve of the Beta Prime (Beta-2) Distribution
 #'
