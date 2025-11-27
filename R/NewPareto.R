@@ -456,7 +456,7 @@ Quantile_NP <- function(p, shape, scale) {
 #NP distributed x: Given a uniform variate U drawn from U(0, 1) distribution, we obtain X, which is NP distributed and is given by
 #' New Pareto Random generating function
 #'
-#' @param u numerical vector, uniform number between 0 and  1.
+#' @param n number of generated values.
 #' @param shape Shape parameter.
 #' @param scale Scale parameter.
 #'
@@ -465,7 +465,10 @@ Quantile_NP <- function(p, shape, scale) {
 #' @examples
 #' random_NP(0.2, shape= 2, scale=100)
 #' #[1] 300
-random_NP <- function (u,shape, scale){(((2*(scale^shape))/u)-(scale^shape))^(1/shape)}
+random_NP <- function (n,shape, scale){
+  u = runif(n)
+  return((((2*(scale^shape))/u)-(scale^shape))^(1/shape))
+  }
 
 ## Gini from NP distribution ------------------
 Gini_NP_Exact <- function(shape){
