@@ -10,7 +10,7 @@ combined_HC = list()
 combined_Param = list()
 combined_CI = list()
 
-for (i in seq_len(nrow(data))) {
+for (i in 1:nrow(data)  ) {
 
   # Extract inputs
   Average <- data$Mean[i]
@@ -138,16 +138,17 @@ for (i in seq_len(nrow(data))) {
   colnames(SUM_CI_NP) = paste0("NP_H_",c("lower", "upper"))
 
   OBS_CI <- data.frame(
+    Country = data$Country[i],
     threshold = thresholds,
-    CI_lower = as.numeric(data[i, ci_lower_cols]),
-    CI_upper = as.numeric(data[i, ci_upper_cols])
+    Obs_lower = as.numeric(data[i, ci_lower_cols]),
+    Obs_upper = as.numeric(data[i, ci_upper_cols])
   )
   }
 
   # Store results
   combined_HC[[i]]  <- SUM_H
   combined_Param[[i]] <- SUM_Param
-  combined_CI[[i]]  <- bind_cols(
+  combined_CI[[i]]  <- dplyr::bind_cols(
     OBS_CI,
     SUM_CI_Fisk,
     SUM_CI_LN,
@@ -170,9 +171,9 @@ writexl::write_xlsx(
     "Parameters" = Param_limited_data,
     "CI" = CI_limited_data
   ),
-  path = paste0(here::here("DataProcessed"),"/Limited data.xlsx")
+  path = paste0(here::here("DATA/DataProcessed"),"/Limited data.xlsx")
 )
 
-save(HC_limited_data, file = "DataProcessed/HC_limited_data.rda")
-save(Param_limited_data, file = "DataProcessed/Param_limited_data.rda")
-save(CI_limited_data, file = "DataProcessed/CI_limited_data.rda")
+save(HC_limited_data, file = "DATA/DataProcessed/HC_limited_data.rda")
+save(Param_limited_data, file = "DATA/DataProcessed/Param_limited_data.rda")
+save(CI_limited_data, file = "DATA/DataProcessed/CI_limited_data.rda")
