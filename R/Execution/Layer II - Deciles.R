@@ -1,7 +1,8 @@
-load("DataProcessed/SumData.rda")
+load("DATA/SumData.rda")
 
-#library(GB2group)
-#library(stringr)
+# library(GB2group)
+# library(dplyr)
+# library(stringr)
 
 # -------------------------
 # MAIN LOOP
@@ -10,7 +11,7 @@ combined_HC = list()
 combined_Param = list()
 combined_HC_CI = list()
 
-for(i in seq_along(data)){
+for(i in 1:nrow(data) ){
 
   # Extract inputs
   Average <- data$Mean[i]
@@ -64,11 +65,11 @@ for(i in seq_along(data)){
       SUM_Param <- compute_param_summary2(SUM_Param, model, fit$par, fit$se)
 
       # Compute headcounts
-      cdf_fun <- get(CDF_registry[[model]]$cdffun)
-      HC <- 100 * cdf_fun(PL_vals, as.list(fit$par))
+      cdf_fun <- CDF_registry[[model]]$cdffun
+      HC <- cdf_fun(PL_vals, as.list(fit$par))
 
        ## Compute headcounts SE
-      HCSE_fun <- get(CDF_registry[[model]]$HCsefun)
+      HCSE_fun <-CDF_registry[[model]]$HCsefun
       HC_SE <- #HCSE_fun(PL_vals, as.list(fit$par), as.list(fit$se))
               sapply(PL_vals, function(z) HCSE_fun(z,as.list(fit$par), as.list(fit$se) ))
                }
@@ -81,6 +82,8 @@ for(i in seq_along(data)){
         HC_SE = HC_SE
       )
 
+      message("Done model ", model, " for Country ", Country, " ...")
+
       }
 
     # combine models output
@@ -89,11 +92,12 @@ for(i in seq_along(data)){
     # merge observed HC
     SUM_H <- model_df %>%
         dplyr::left_join(observed_HC, by = "threshold") %>%
-        dplyr::select(Country, threshold, observed_HC, model, model_H)
+        dplyr::select(Country, threshold, model, observed_HC, HC, HC_SE)
 
     ## Save Results
     combined_HC[[i]]  <- SUM_H
     combined_Param[[i]] <- SUM_Param
+
   }
 
 combined_HC_df  <- bind_rows(combined_HC)

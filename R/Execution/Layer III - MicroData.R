@@ -2,7 +2,7 @@
 # library(VGAM)        # for Fisk, Dagum, Singh-Maddala, GB2
 # library(tidyverse)
 
-load("DATA/DataProcessed/micro_data_hic.rda")
+load("DATA/micro_data_hic.rda")
 
 dllogis = VGAM::dfisk; pllogis = VGAM::pfisk ; qllogis = VGAM::qfisk
 dnewpareto = pdf_NP; pnewpareto = CDF_NP; qnewpareto = Quantile_NP

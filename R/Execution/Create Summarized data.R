@@ -1,3 +1,3 @@
 data = summarize_data()
-save(data, file = "DATA/DataProcessed/SumData.rda")
-#load("DATA/DataProcessed/SumData.rda")
+save(data, file = "DATA/SumData.rda")
+#load("DATA/SumData.rda")

@@ -1,4 +1,4 @@
-load("Data/DataProcessed/SumData.rda")
+load("DATA/SumData.rda")
 
 #library(dplyr)
 #library(stringr)
@@ -171,9 +171,9 @@ writexl::write_xlsx(
     "Parameters" = Param_limited_data,
     "CI" = CI_limited_data
   ),
-  path = paste0(here::here("DATA/DataProcessed"),"/Limited data.xlsx")
+  path = paste0(here::here("DATA"),"/Limited data.xlsx")
 )
 
-save(HC_limited_data, file = "DATA/DataProcessed/HC_limited_data.rda")
-save(Param_limited_data, file = "DATA/DataProcessed/Param_limited_data.rda")
-save(CI_limited_data, file = "DATA/DataProcessed/CI_limited_data.rda")
+save(HC_limited_data, file = "DATA/HC_limited_data.rda")
+save(Param_limited_data, file = "DATA/Param_limited_data.rda")
+save(CI_limited_data, file = "DATA/CI_limited_data.rda")
