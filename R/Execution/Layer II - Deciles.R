@@ -1,4 +1,4 @@
-load("DATA/SumData.rda")
+load("data/SumData.rda")
 
 # library(GB2group)
 # library(dplyr)

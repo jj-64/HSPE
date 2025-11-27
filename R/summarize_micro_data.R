@@ -12,6 +12,6 @@
                          country_filter = country_filter)
 
   # ---- 2. Save clean microdata ----
-    if(update) save(micro_data_hic, file = "DATA/micro_data_hic.rda")
+    if(update) save(micro_data_hic, file = "data/micro_data_hic.rda")
 
 }
