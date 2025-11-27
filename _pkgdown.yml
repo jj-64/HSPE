@@ -1,0 +1,40 @@
+```yaml
+site_url: https://jj-64.github.io/HSPE
+template:
+  params:
+    bootswatch: flatly
+navbar:
+  structure:
+  left:
+    - text: Reference
+      href: reference/index.html
+  right:
+    - text: GitHub
+      href: https://github.com/jj-64/HSPE
+
+home:
+  title: HSPE
+  description: "Tools for income distribution and record-process analysis"
+
+reference:
+  - title: Functions
+    contents:
+      - plot_lorenz
+      - plot_decile_shares
+      - plot_headcount_models
+      - plot_parametric_fit
+      - plot_country_summary
+
+articles:
+  - title: Vignettes
+    contents:
+      - Analysis_with_HSPE
+````
+
+To build site locally:
+
+```r
+pkgdown::build_site()
+```
+
+---
