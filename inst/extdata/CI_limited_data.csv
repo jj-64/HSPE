@@ -1,0 +1,7 @@
+Column,Type,Description
+Country,character,Country code
+threshold,numeric,"Fraction of mean (0.2,0.5,0.8)"
+Obs_lower / Obs_upper,numeric,CI for observed headcount
+FISK_H_lower / FISK_H_upper,numeric,CI for Fisk headcount
+LN_H_lower / LN_H_upper,numeric,CI for Lognormal headcount
+NP_H_lower / NP_H_upper,numeric,CI for NP headcount

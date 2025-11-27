@@ -1,0 +1,6 @@
+Column,Type,Description
+Observed,numeric,Observed headcount ratio
+FISK_H / LN_H / NP_H,numeric,Model-based headcounts
+Country,character,Country code
+FISK_H_SE / LN_H_SE / NP_H_SE,numeric,Standard errors
+threshold,numeric,Ratio of poverty line to mean

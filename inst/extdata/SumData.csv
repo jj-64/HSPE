@@ -1,0 +1,12 @@
+Column,Type,Description
+Country,character,"Country code + survey year (e.g., ""at94"")"
+N,numeric,Number of observations in microdata
+Mean,numeric,Sample mean income
+Mean_SE,numeric,Standard error of the mean
+median,numeric,Sample median
+Gini,numeric,Gini coefficient
+Gini_SE,numeric,Standard error of the Gini
+d1..d10,numeric,Income shares by decile (percent)
+HC_20 / HC_50 / HC_80,numeric,"Headcount ratios at thresholds of mean (0.2,0.5,0.8)"
+HC_SE_*,numeric,Standard errors of headcounts (binomial approx)
+CI_lower_* / CI_upper_*,numeric,95% CI bounds for headcounts

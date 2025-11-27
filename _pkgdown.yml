@@ -1,4 +1,4 @@
-```yaml
+
 site_url: https://jj-64.github.io/HSPE
 template:
   params:
@@ -29,12 +29,10 @@ articles:
   - title: Vignettes
     contents:
       - Analysis_with_HSPE
-````
 
-To build site locally:
 
-```r
-pkgdown::build_site()
-```
+#To build site locally:
 
----
+#```r
+#pkgdown::build_site()
+#```

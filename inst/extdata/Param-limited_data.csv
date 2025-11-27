@@ -1,0 +1,6 @@
+Column,Type,Description
+Parameter,character,"Parameter name (e.g., ""shape/?"")"
+Fisk / Fisk_SE,numeric,Fisk parameter and SE
+LN / LN_SE,numeric,Lognormal parameter and SE
+NP / NP_SE,numeric,NP parameter and SE
+Country,character,Country code
