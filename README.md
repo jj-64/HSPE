@@ -9,6 +9,9 @@ library(HSPE)
 detach("package:HSPE", unload = TRUE)
 
 # 2 - Load data
+\describe{
+\item{"SumData"}{summary income distribution statistics}
+}
 data("SumData")
 head(SumData)
 
