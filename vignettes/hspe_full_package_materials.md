@@ -1,7 +1,5 @@
 
 # ===================================
-# 2. FILE: vignettes/Analysis_with_HSPE.Rmd
-# ===================================
 
 # Introduction
 The **HSPE package** provides a set of harmonized inequality indicators, poverty headcount measures, parametric model fits, and distribution summaries across multiple countries.
@@ -18,7 +16,7 @@ This vignette demonstrates:
 library(HSPE)
 ```
 
-# Available datasets
+# Available functions
 ```{r}
 ls("package:HSPE")
 ```
@@ -28,17 +26,31 @@ ls("package:HSPE")
 head(SumData)
 ```
 
-# Lorenz curve
+# Example: Inspect Computations from limited data
+```{r}
+head(CI_limited_data)
+head(HC_limited_data)
+head(Param_limited_data)
+```
+
+# Example: Inspect Computations from grouped data
+```{r}
+head(CI_grouped_data)
+head(HC_grouped_data)
+head(Param_grouped_data)
+```
+
+# Plot: Lorenz curve
 ```{r}
 plot_lorenz(SumData[1, ])
 ```
 
-# Decile income shares
+# Plot: Decile income shares
 ```{r}
 plot_decile_shares(SumData[1, ])
 ```
 
-# Observed vs parametric headcounts
+# Plot: Observed vs parametric headcounts
 ```{r}
 country <- "at94"
 plot_headcount_models(
@@ -47,12 +59,12 @@ plot_headcount_models(
 )
 ```
 
-# Parametric density fit
+# Plot: Parametric density fit
 ```{r}
 plot_parametric_fit(Param_limited_data[Param_limited_data$Country=="at94", ])
 ```
 
-# Complete Summary
+# Plot: Complete Summary
 ```{r}
 plot_country_summary("at94")
 ```
@@ -61,23 +73,5 @@ plot_country_summary("at94")
 This vignette illustrates how HSPE can be used to explore income distribution, inequality, poverty, and parametric modeling.
 ```
 
----
 
-# =================================
-# 3. Roxygen2 Documentation (all functions)
-# =================================
-
-All documentation was inserted directly into the R file.
-No additional work required here.
-
----
-
-If you'd like, I can also generate:
-- **pkgdown website** configuration
-- **unit tests** (testthat)
-- **DESCRIPTION imports cleanup**
-- **automated examples** for each dataset
-- **README.md** with badges and installation instructions
-
-Just tell me!
 
