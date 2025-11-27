@@ -158,7 +158,8 @@ compute_headcounts_limited <- function(
     )
   }
 
-  rownames(HC) = PL_vals$ratio
+  #rownames(HC) = PL_vals$ratio
+  HC$threshold = PL_vals$ratio
   return(HC)
 }
 
