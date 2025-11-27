@@ -1,0 +1,12 @@
+---
+title: "Analysis with the HSPE Package"
+author: "HSPE Team"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{HSPE Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
