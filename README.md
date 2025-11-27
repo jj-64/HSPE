@@ -3,15 +3,19 @@ Household Survey Parameter Estimation
 
 # 0 - How to install, load and detach
 devtools::install_github("jj-64/HSPE", upgrade = "ask"), the user can load:
+
 library(HSPE)
 
 #Detach library
+
 detach("package:HSPE", unload = TRUE)
 
-#oad data
+#Load data
+
 "SumData" : summary income distribution statistics
 
 data("SumData")
+
 head(SumData)
 
 # 1 - Create summarized data
