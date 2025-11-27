@@ -1,11 +1,14 @@
 # HSPE
 Household Survey Parameter Estimation
 
-# 0 - HOw to install
-devtools::install_github("jj-64/HSPE")), the user can load:
+# 0 - How to install
+devtools::install_github("jj-64/HSPE", upgrade = "ask"), the user can load:
 library(HSPE)
 
-# 1 - Load data
+# 1 - Detach library
+detach("package:HSPE", unload = TRUE)
+
+# 2 - Load data
 data("SumData")
 head(SumData)
 
