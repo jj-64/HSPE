@@ -102,48 +102,50 @@ for(i in 1:nrow(data) ){
 
 combined_HC_df  <- bind_rows(combined_HC)
 combined_Param_df <- bind_rows(combined_Param)
+save(combined_HC_df, file = "data/combined_HC_df.rda")
+save(combined_Param_df, file = "data/combined_Param_df.rda")
 
-######### Fit statistics -----------
-    # KS statistic (synthetic sample)
-    if(model %in% c("DA","SM")){
-      sample <- switch(name,
-                       Dagum = rdagum(N, par$b, par$a, par$p),
-                       SM    = rsm(N, par$b, par$a, par$p))
-      emp <- ecdf(sample)(sample)
-      theo <- cdf_fun(sample, param)
-      KS_row[j] <- max(abs(emp - theo))
-    }
-
-
-
-
-  # Record outputs
-
-  SE_row$Country <- df0$r1[i]
-  KS_df <- data.frame(Dist=dist_names, KS=KS_row, Country=df0$r1[i])
-
-  results_SE[[i]]  <- SE_row
-  results_KS[[i]]  <- KS_df
-
-
-# -----------------------------
-# Combine ALL outputs
-# -----------------------------
-df_H   <- bind_rows(combined_HC)
-df_PAR <- bind_rows(results_PAR)
-df_SE  <- bind_rows(results_SE)
-df_KS  <- bind_rows(results_KS)
-
-# -----------------------------
-# Export
-# -----------------------------
-write_xlsx(
-  list(
-    H = df_H,
-    Parameters = df_PAR,
-    SE = df_SE,
-    KS = df_KS
-  ),
-  "resultsFISKadjusted999.xlsx"
-)
-
+# ######### Fit statistics -----------
+#     # KS statistic (synthetic sample)
+#     if(model %in% c("DA","SM")){
+#       sample <- switch(name,
+#                        Dagum = rdagum(N, par$b, par$a, par$p),
+#                        SM    = rsm(N, par$b, par$a, par$p))
+#       emp <- ecdf(sample)(sample)
+#       theo <- cdf_fun(sample, param)
+#       KS_row[j] <- max(abs(emp - theo))
+#     }
+#
+#
+#
+#
+#   # Record outputs
+#
+#   SE_row$Country <- df0$r1[i]
+#   KS_df <- data.frame(Dist=dist_names, KS=KS_row, Country=df0$r1[i])
+#
+#   results_SE[[i]]  <- SE_row
+#   results_KS[[i]]  <- KS_df
+#
+#
+# # -----------------------------
+# # Combine ALL outputs
+# # -----------------------------
+# df_H   <- bind_rows(combined_HC)
+# df_PAR <- bind_rows(results_PAR)
+# df_SE  <- bind_rows(results_SE)
+# df_KS  <- bind_rows(results_KS)
+#
+# # -----------------------------
+# # Export
+# # -----------------------------
+# write_xlsx(
+#   list(
+#     H = df_H,
+#     Parameters = df_PAR,
+#     SE = df_SE,
+#     KS = df_KS
+#   ),
+#   "resultsFISKadjusted999.xlsx"
+# )
+#
