@@ -1,5 +1,5 @@
-load("DataProcessed/SumData.rda")
-load("DataProcessed/HC_Grouped data.rda")
+load("data/SumData.rda")
+#load("data/HC_Grouped data.rda")
 
 # final storage as clean long-format tibbles
 PARAM_ROWS <- list()
@@ -9,7 +9,7 @@ DIAG_ROWS  <- list()
 models <- names(CDF_registry)
 
 ## Loop over all countries #
-for (i in seq_len(nrow(data))) {
+for (i in seq_len(nrow(data)) ){
 
   Country    <- data$Country[i]
   Average    <- data$Mean[i]
@@ -141,9 +141,9 @@ writexl::write_xlsx(
     "Parameters" = Param_grouped_data,
     "Diagonistic" = Diag_grouped_data
   ),
-  path = paste0(here::here("DataProcessed"),"/Grouped data.xlsx")
+  path = paste0(here::here("data"),"/Grouped data.xlsx")
 )
 
-save(HC_grouped_data, file = "DataProcessed/HC_grouped_data.rda")
-save(Param_grouped_data, file = "DataProcessed/Param_grouped_data.rda")
-save(Diag_grouped_data, file = "DataProcessed/Diag_grouped_data.rda")
+save(HC_grouped_data, file = "data/HC_grouped_data.rda")
+save(Param_grouped_data, file = "data/Param_grouped_data.rda")
+save(Diag_grouped_data, file = "data/Diag_grouped_data.rda")
