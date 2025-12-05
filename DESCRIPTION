@@ -9,3 +9,4 @@ Description: fit distribution using mutiple data availability (limited, grouped 
 License: MIT
 Encoding: UTF-8
 RoxygenNote: 7.3.2
+Depends: R (>= 3.6)

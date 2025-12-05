@@ -193,7 +193,7 @@ R_Lorenz_LN = function(y, R_mu, popw, mu, sigma) { ## the income group y, region
 ## Headcount Standard Error ---------------
 #' Standard Error of Lognormal Headcount Ratio
 #'
-#' @param p Poverty line
+#' @param y numerical value, poverty line
 #' @param mean_y numerical value, observed mean of the variable
 #' @param sigma numerical value, lognormal scale positive parameter
 #' @param se_mean standard error of the mean
