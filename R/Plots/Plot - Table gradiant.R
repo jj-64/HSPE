@@ -14,10 +14,8 @@ if(length(missing_packages)) {
 lapply(required_packages, library, character.only = TRUE)
 
 ############## Load Data ########################
-# HC_micro_data <- as.data.frame(read_excel("data/Micro data.xlsx"))
-# save(HC_micro_data, file = "data/HC_micro_data.rda")
 
-load("data/HC_micro_data.rda")
+load("data/HC_micro_data.rda")   ## we can replace by load("data/HC_grouped_data.rda") or limited_data
 
 data_H = HC_micro_data
 data_H = na.omit(data_H)
@@ -43,6 +41,7 @@ abs_delta_Sum <- data_H %>%
   mutate(prop = n / sum(n))
 
 abs_delta_Sum <- as.data.frame(abs_delta_Sum )
+#abs_delta_Sum = subset(abs_delta_Sum, model != "BetaPrime")
 
 # Plot using ggplot2
 ggplot(abs_delta_Sum, aes(x = model, y = abs_group, fill = prop)) +
@@ -72,6 +71,7 @@ rel_delta_Sum <- data_H %>%
   mutate(prop = n / sum(n))
 
 rel_delta_Sum <- as.data.frame(rel_delta_Sum )
+#rel_delta_Sum = subset(rel_delta_Sum, model != "BetaPrime")
 
 # Plot using ggplot2
 ggplot(rel_delta_Sum, aes(x = model, y = rel_group, fill = prop)) +
