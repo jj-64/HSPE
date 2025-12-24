@@ -69,7 +69,7 @@ CDF_registry <- list(
   LN = list(
     params = c("mu", "s"),
 
-    fitfun = "fitgroup.ln",
+    fitfun = GB2group::fitgroup.ln,
 
     cdffun = function(y, pars) {
       CDF_LN(y, mean_y = exp(pars$mu), sigma = pars$s)
