@@ -1,13 +1,14 @@
-library(ggplot2)
-library(dplyr)
-library(tidyr)
+# library(ggplot2)
+# library(dplyr)
+# library(tidyr)
+
 # Limited_data <- read_excel("data/Limited data.xlsx", sheet = "Parameters")
 # Param_limited_data = as.data.frame(Limited_data)
 # save(Param_limited_data, file = "data/Param_limited_data.rda")
 
 data("HC_limited_data")
 HC_long <- HC_limited_data %>%
-  pivot_longer(cols = c(observed_HC, HC),
+  tidyr::pivot_longer(cols = c(observed_HC, HC),
                names_to = "Model",
                values_to = "Headcount")
 

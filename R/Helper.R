@@ -242,12 +242,12 @@ NP_SE   = NA
 )
 }
 
-#library(dplyr)
+
 ##Function to expand data according to HH weight vector -----------
 replicate_rows <- function(df) {
   df = df %>%
-    slice(rep(1:n(), hwgt))  %>%
-    ungroup()
+    dplyr::slice(rep(1:n(), hwgt))  %>%
+    dplyr::ungroup()
   return(as.data.frame(df))
 }
 

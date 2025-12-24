@@ -1,6 +1,3 @@
-# library(fitdistrplus)
-# library(VGAM)        # for Fisk, Dagum, Singh-Maddala, GB2
-# library(tidyverse)
 
 load("data/micro_data_hic.rda")
 
