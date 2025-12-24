@@ -1,9 +1,5 @@
 load("data/SumData.rda")
 
-# library(GB2group)
-# library(dplyr)
-# library(stringr)
-
 # -------------------------
 # MAIN LOOP
 # -------------------------
