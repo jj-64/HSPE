@@ -35,7 +35,8 @@
 #' @usage data("CI_limited_data")
 #'
 #' @examples
+#' \dontrun{
 #' data(CI_limited_data)
 #' head(CI_limited_data)
-#'
+#'}
 "CI_limited_data"
