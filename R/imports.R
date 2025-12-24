@@ -24,6 +24,4 @@
 #' @importFrom colorspace lighten
 #' @importFrom scales percent
 #' @importFrom haven read_dta
-#' @importFrom
-#' @importFrom
 NULL

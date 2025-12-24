@@ -34,7 +34,7 @@ Imports:
     colorspace,
     scales,
     haven,
-    giniVarCI,
+    giniVarCI
 Suggests:
     testthat (>= 3.0.0),
     knitr,
