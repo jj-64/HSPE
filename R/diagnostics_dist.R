@@ -1,10 +1,42 @@
 ## Grouped data -----------------
-#diagnostics_grouped(L_obs = L_values, Lorenz_fun = Lorenz_FISK, par = 2, N=N)
+#' Diagonistics for grouped data
+#'
+#' Compute multiple measures for diagnostics from grouped data
+#'
+#' @param L_obs observed Lorenz cumulative shares at p
+#' @param Lorenz_fun Lorenz function(p, par): model Lorenz curve
+#' @param par list of parameters estimated
+#' @param N sample size (for grouped likelihood)
+#' @export
+#' @examples
+#' observed = c(0.2,0.28,0.31,0.4,0.6)
+#' Lorenz = function (p, pars) pnorm(qnorm(p) - pars$s) # cdf_registry[["LN"]]$lorenzfun
+#' param_list = list(mu = 1, s =2)
+#' diagnostics_grouped(L_obs = observed, Lorenz_fun = Lorenz, par = param_list, N=100)
+#' # $KS
+#' # [1] 0.3637596
+#' #
+#' # $MSE
+#' # [1] 0.08773977
+#' #
+#' # $RMSE
+#' # [1] 0.296209
+#' #
+#' # $logLik
+#' # [1] -434.7308
+#' #
+#' # $AIC
+#' # [1] 873.4617
+#' #
+#' # $BIC
+#' # [1] 878.672
+#' #
+#' # $L_theo
+#' # [1] 0.0005161882 0.0057947902 0.0227501319 0.0700257214 0.2362404159
+#' #
+#' # $L_obs
+#' # [1] 0.20 0.28 0.31 0.40 0.60
 diagnostics_grouped <- function(L_obs, Lorenz_fun, par, N) {
-  # L_obs: observed Lorenz cumulative shares at p
-  # Lorenz_fun(p, par): model Lorenz curve
-  # par: parameter list
-  # N: sample size (for grouped likelihood)
 
   # Model Lorenz curve
   p <- seq(0.1 , 1, by = (1/length(L_obs)) )
@@ -22,8 +54,8 @@ diagnostics_grouped <- function(L_obs, Lorenz_fun, par, N) {
   RMSE <- sqrt(MSE)
 
   # --- 3. Grouped log-likelihood
-  # Prob. mass in each bin = ΔCDF
-  # But we approximate ΔCDF using ΔLorenz * (mean * population)
+  # Prob. mass in each bin = Δcdf
+  # But we approximate Δcdf using ΔLorenz * (mean * population)
   # Simpler alternative: use ΔLorenz only (scale-free)
   dL <- diff(c(0, L_theo))
   dL[dL <= 0] <- 1e-12
@@ -50,13 +82,36 @@ diagnostics_grouped <- function(L_obs, Lorenz_fun, par, N) {
 }
 
 ## Micro data----------------------
-#pdf_FISK_param = function(y, param){pdf_FISK(y=y, scale= param$a, shape = param$b)}
-#diagonistics_dist(y = y, cdf = CDF_FISK_param, pdf = pdf_FISK_param, param = as.list(c(a=1, b=2)))
+#' Diagnostics for micro data
+#'
+#' Compute multiple measures for diagnostics from micro data
+#'
+#' @param y observed individual income values
+#' @param cdf function(y, param) returning vector of cdf values
+#' @param pdf function(y, param) returning vector of PDF values
+#' @param param list of named vector of parameters
+#' @export
+#' @examples
+#' y = c(100, 200, 250, 300, 400)
+#' param_list = list(a=1, b=2)
+#' pdf_FISK_param = function(y, param){pdf_FISK(y=y, scale= param$a, shape = param$b)}
+#' cdf_FISK_param = function(y, param){cdf_FISK(y=y, scale= param$a, shape = param$b)}
+#' diagnostics_micro(y = y, cdf = cdf_FISK_param, pdf = pdf_FISK_param, param = param_list)
+#' # $KS_stat
+#' # [1] 0.7999
+#' #
+#' # $KS_pvalue
+#' # [1] 1
+#' #
+#' # $logLik
+#' # [1] -77.89517
+#' #
+#' # $AIC
+#' # [1] 159.7903
+#' #
+#' # $BIC
+#' # [1] 159.0092
 diagnostics_micro <- function(y, cdf, pdf, param) {
-  # y: data vector
-  # cdf: function(y, param) returning vector of CDF values
-  # pdf: function(y, param) returning vector of PDF values
-  # param: list of named vector of parameters
 
   # -- Sort data for KS test
   y_sorted <- sort(y)
