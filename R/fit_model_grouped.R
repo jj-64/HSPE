@@ -47,7 +47,7 @@ fit_model_grouped <- function(model = c("DA","SM","B2","GB2","FISK","LN","NP"),
   }
 
   info <- CDF_registry[[model]]
-  fitfun <- get(info$fitfun)
+  fitfun <- info$fitfun
 
   tryCatch({
     fit <- fitfun(
