@@ -1,5 +1,4 @@
 
-#library(numDeriv)
 
 # CDF_B2 ------
 #' @title CDF of the Beta Prime (Beta-2) Distribution
@@ -30,7 +29,6 @@ CDF_B2 <- function(y, b, p, q) {
   pbeta(z, p, q)
 }
 
-#library(numDeriv)
 
 # pdf_B2 ------
 #' @title pdf of the Beta Prime (Beta-2) Distribution
