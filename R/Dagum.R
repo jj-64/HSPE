@@ -1,8 +1,8 @@
-## CDF ------------------
-#' @title CDF of the Dagum Distribution
+## cdf ------------------
+#' @title cdf of the Dagum Distribution
 #'
 #' @description
-#' Computes the Dagum CDF:
+#' Computes the Dagum cdf:
 #'
 #' \deqn{
 #' F(y \mid a, b, p)
@@ -17,13 +17,13 @@
 #' @param b Scale parameter \eqn{b > 0}.
 #' @param p Shape parameter \eqn{p > 0}.
 #'
-#' @return Numeric vector of CDF values.
+#' @return Numeric vector of cdf values.
 #'
 #' @examples
-#' CDF_DA(1:5, a = 2, b = 1, p = 3)
+#' cdf_DA(1:5, a = 2, b = 1, p = 3)
 #'
 #' @export
-CDF_DA <- function(y, a, b, p) {
+cdf_DA <- function(y, a, b, p) {
   (1 + (y / b)^(-a))^(-p)
 #VGAM::pdagum(q=y, shape1.a = a, shap2.p = p, scale=b)
 }
@@ -71,7 +71,7 @@ Lorenz_DA <- function(u = seq(0.1, 1, by = 0.1), a, b, p) {
 #'
 #' @description
 #' Computes **delta-method standard errors** for headcount poverty indices
-#' using the Dagum CDF:
+#' using the Dagum cdf:
 #'
 #' \deqn{
 #' H(z) = F(z \mid a, b, p)
@@ -104,7 +104,7 @@ Lorenz_DA <- function(u = seq(0.1, 1, by = 0.1), a, b, p) {
 #' - This implementation assumes **independent parameter estimates**
 #'   (diagonal covariance matrix).
 #' - If a full vcov matrix is available, the function can be extended easily.
-#' - Computes the analytical gradient of the Dagum CDF wrt \eqn{a,b,p}.
+#' - Computes the analytical gradient of the Dagum cdf wrt \eqn{a,b,p}.
 #'
 #' @examples
 #' y <- c(1, 2, 3)
@@ -122,7 +122,7 @@ HC_se_DA <- function(y, a, b, p, se_a, se_b, se_p) {
 
   y <- as.numeric(y)
 
-  # compute u and F (CDF)
+  # compute u and F (cdf)
   u <- (y / b)^(-a)
   w <- 1 + 1/u  ## 1+ (y/b)^a
   Fval <- (1 + u)^(-p)

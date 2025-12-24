@@ -1,8 +1,8 @@
-# ---- CDF for GB2 ----
-#' @title CDF of the Generalized Beta of the Second Kind (GB2)
+# ---- cdf for GB2 ----
+#' @title cdf of the Generalized Beta of the Second Kind (GB2)
 #'
 #' @description
-#' Computes the CDF of the GB2 distribution:
+#' Computes the cdf of the GB2 distribution:
 #'
 #' \deqn{
 #' F(y \mid a, b, p, q)
@@ -17,13 +17,13 @@
 #' @param p Shape parameter \eqn{p > 0}.
 #' @param q Shape parameter \eqn{q > 0}.
 #'
-#' @return Numeric vector of CDF values.
+#' @return Numeric vector of cdf values.
 #'
 #' @examples
-#' CDF_GB2(1:5, a = 2, b = 1, p = 3, q = 4)
+#' cdf_GB2(1:5, a = 2, b = 1, p = 3, q = 4)
 #'
 #' @export
-CDF_GB2 <- function(y, a, b, p, q) {
+cdf_GB2 <- function(y, a, b, p, q) {
   z <- (y / b)^a
   u <- z / (1 + z)
   pbeta(u, p, q)
@@ -68,11 +68,11 @@ Lorenz_GB2 <- function(u, a, b, p, q) {
   return(L)
 }
 
-# ---- Gradient of CDF wrt parameters (numerically) ----
-#' @title Numerical Gradient of GB2 CDF
+# ---- Gradient of cdf wrt parameters (numerically) ----
+#' @title Numerical Gradient of GB2 cdf
 #'
 #' @description
-#' Computes a numerical gradient of the GB2 CDF with respect to
+#' Computes a numerical gradient of the GB2 cdf with respect to
 #' \eqn{(a, b, p, q)} using forward finite differences.
 #'
 #' \deqn{
@@ -88,12 +88,12 @@ Lorenz_GB2 <- function(u, a, b, p, q) {
 #' @return A matrix of size \code{length(y) × 4}, one gradient per parameter.
 #'
 #' @examples
-#' grad_CDF_GB2(1:3, a = 2, b = 1, p = 3, q = 4)
+#' grad_cdf_GB2(1:3, a = 2, b = 1, p = 3, q = 4)
 #'
 #' @export
-grad_CDF_GB2 <- function(y, a, b, p, q, eps = 1e-6) {
+grad_cdf_GB2 <- function(y, a, b, p, q, eps = 1e-6) {
   param <- c(a = a, b = b, p = p, q = q)
-  f0 <- CDF_GB2(y, a, b, p, q)
+  f0 <- cdf_GB2(y, a, b, p, q)
 
   g <- matrix(0, nrow = length(y), ncol = 4)
   colnames(g) <- names(param)
@@ -102,7 +102,7 @@ grad_CDF_GB2 <- function(y, a, b, p, q, eps = 1e-6) {
     param_eps <- param
     param_eps[nm] <- param_eps[nm] + eps
 
-    f1 <- CDF_GB2(
+    f1 <- cdf_GB2(
       y,
       a = param_eps["a"],
       b = param_eps["b"],
@@ -141,7 +141,7 @@ grad_CDF_GB2 <- function(y, a, b, p, q, eps = 1e-6) {
 #'
 #' @details
 #' - Assumes independence of parameter estimates (diagonal covariance).
-#' - Uses numerical gradient from \code{grad_CDF_GB2()}.
+#' - Uses numerical gradient from \code{grad_cdf_GB2()}.
 #'
 #' @examples
 #' HC_se_GB2(
@@ -152,7 +152,7 @@ grad_CDF_GB2 <- function(y, a, b, p, q, eps = 1e-6) {
 #'
 #' @export
 HC_se_GB2 <- function(y, a, b, p, q, se_a, se_b, se_p, se_q) {
-  g <- grad_CDF_GB2(y, a = a, b = b, p = p, q = q)
+  g <- grad_cdf_GB2(y, a = a, b = b, p = p, q = q)
 
   vcov <- diag(c(se_a, se_b, se_p, se_q)^2)
 

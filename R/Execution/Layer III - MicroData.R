@@ -5,7 +5,7 @@
 load("data/micro_data_hic.rda")
 
 dllogis = VGAM::dfisk; pllogis = VGAM::pfisk ; qllogis = VGAM::qfisk
-dnewpareto = pdf_NP; pnewpareto = CDF_NP; qnewpareto = Quantile_NP
+dnewpareto = pdf_NP; pnewpareto = cdf_NP; qnewpareto = Quantile_NP
 ddagum <- function(x, shape1.a, shape2.p, scale, log = FALSE) {
   if (length(x) == 0) return(numeric(0))
   VGAM::ddagum(x, shape1.a = shape1.a, shape2.p = shape2.p, scale=scale, log)

@@ -6,62 +6,62 @@
 # library(laeken)
 #options(scipen = 999)
 
-# Helper: CDF Registry -----------------------------
+# Helper: cdf Registry -----------------------------
 #
-# CDF_registry <- list(
+# cdf_registry <- list(
 #   DA = list(
 #     fitfun = "fitgroup.da",
 #     fitmicro = "llogis",
 #     params  = c("a","b","p"),  ## b is scale
-#     cdffun  = "CDF_DA_param",
+#     cdffun  = "cdf_DA_param",
 #     HCsefun = "HC_SE_DA_param"
 #   ),
 #   SM = list(
 #     fitfun = "fitgroup.sm",
 #     fitmicro = "",
 #     params  = c("a","b","q"),
-#     cdffun  = "CDF_SM_param",
+#     cdffun  = "cdf_SM_param",
 #     HCsefun = "HC_SE_SM_param"
 #   ),
 #   B2 = list(
 #     fitfun = "fitgroup.b2",
 #     fitmicro = "beta2",
 #     params  = c("p","q","b"),
-#     cdffun  = "CDF_B2_param",
+#     cdffun  = "cdf_B2_param",
 #     HCsefun = "HC_SE_B2_param"
 #   ),
 #   GB2 = list(
 #     fitfun = "fitgroup.gb2",
 #     fitmicro = "GB2",
 #     params  = c("a","b","p","q"),
-#     cdffun  = "CDF_GB2_param",
+#     cdffun  = "cdf_GB2_param",
 #     HCsefun = "HC_SE_GB2_param"
 #   ),
 #   FISK = list(
 #     fitfun = "fitgroup.f",
 #     fitmicro = "llogis",
 #     params  = c("a","b"),
-#     cdffun  = "CDF_FISK_param",
+#     cdffun  = "cdf_FISK_param",
 #     HCsefun = "HC_se_FISK_param"
 #   ),
 #   LN = list(
 #     fitfun = "fitgroup.ln",
 #     fitmicro = "lognormal",
 #     params  = c("s","mu"),
-#     cdffun  = "CDF_LN_param",
+#     cdffun  = "cdf_LN_param",
 #     HCsefun = "HC_se_LN_param"
 #   ),
 #   NP = list(
 #     fitfun = "fitgroup.np",
 #     fitmicro = "",
 #     params = c("shape", "scale"),
-#     cdffun = "CDF_NP_param",
+#     cdffun = "cdf_NP_param",
 #     HCsefun = "HC_se_NP_param"
 #   )
 # )
 
 
-CDF_registry <- list(
+cdf_registry <- list(
 
   # ---------------------------------------------------------
   # 1. LOGNORMAL
@@ -72,7 +72,7 @@ CDF_registry <- list(
     fitfun = GB2group::fitgroup.ln,
 
     cdffun = function(y, pars) {
-      CDF_LN(y, mean_y = exp(pars$mu), sigma = pars$s)
+      cdf_LN(y, mean_y = exp(pars$mu), sigma = pars$s)
     },
 
     pdffun = function(y, pars) {
@@ -98,7 +98,7 @@ CDF_registry <- list(
     fitfun = GB2group::fitgroup.f, #"fitgroup.f",
 
     cdffun = function(y, pars) {
-      CDF_FISK(y, scale = pars$b, shape = pars$a )
+      cdf_FISK(y, scale = pars$b, shape = pars$a )
     },
 
     pdffun = function(y, pars) {
@@ -123,7 +123,7 @@ CDF_registry <- list(
     fitfun = GB2group::fitgroup.np, #"fitgroup.np",
 
     cdffun = function(y, pars) {
-      CDF_NP(y, scale = pars$scale, shape = pars$shape )
+      cdf_NP(y, scale = pars$scale, shape = pars$shape )
     },
 
     pdffun = function(y, pars) {
@@ -232,7 +232,7 @@ CDF_registry <- list(
     fitfun = GB2group::fitgroup.b2, #"fitgroup.b2",
 
     cdffun = function(y, pars) {
-      CDF_B2(y, b= pars$b, p=pars$p, q=pars$q)
+      cdf_B2(y, b= pars$b, p=pars$p, q=pars$q)
     },
 
     pdffun = function(y, pars) {

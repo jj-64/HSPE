@@ -3,7 +3,7 @@
 #'
 #' This function computes poverty headcount ratios for one or more
 #' parametric income distributions (Lognormal, Fisk, and New Pareto).
-#' It evaluates the cumulative distribution function (CDF) at each
+#' It evaluates the cumulative distribution function (cdf) at each
 #' poverty line provided in `PL_vals` and returns model-specific
 #' headcounts (in percent) alongside the observed headcount.
 #'
@@ -126,7 +126,7 @@ compute_headcounts_limited <- function(
 
     HC$FISK_H <- sapply(
       PL_vals$pl,
-      function(p) CDF_FISK(y = p, scale = Fisk_scale, shape = Fisk_shape)
+      function(p) cdf_FISK(y = p, scale = Fisk_scale, shape = Fisk_shape)
     )
   }
 
@@ -154,7 +154,7 @@ compute_headcounts_limited <- function(
 
     HC$NP_H <- sapply(
       PL_vals$pl,
-      function(p) CDF_NP(p, shape = NP_shape, scale = NP_scale)
+      function(p) cdf_NP(p, shape = NP_shape, scale = NP_scale)
     )
   }
 
@@ -353,7 +353,7 @@ compute_headcounts2 <- function(Country, data, L_nonCum, mean_y, Gini, N, PL_val
 
   results <- list()
 
-  for (model in names(CDF_registry)) {
+  for (model in names(cdf_registry)) {
 
     fit <- fit_model_grouped(model, L_nonCum, mean_y, Gini, N)
     if (!fit$ok) next

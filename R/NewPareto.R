@@ -268,7 +268,7 @@ se_scale_NP <- function(mean_y, Gini, se_mean, se_Gini, shape=NA, se_shape = NA,
 }
 
 ## Lorenz Curve for the country -------------
-CDF_NP_integral = function(y, shape, scale) { ## the income group y, shape and scale of the NPareto, mean income
+cdf_NP_integral = function(y, shape, scale) { ## the income group y, shape and scale of the NPareto, mean income
 
   ## vector for the intergrals
 
@@ -412,19 +412,19 @@ pdf_NP <- function(y, shape, scale) {
   )
 }
 
-## CDF of NewPareto ----------------
-#' New Pareto CDF
+## cdf of NewPareto ----------------
+#' New Pareto cdf
 #'
 #' @param q Quantile/income.
 #' @param shape Shape parameter.
 #' @param scale Scale parameter.
 #'
-#' @return CDF value.
+#' @return cdf value.
 #' @export
 #' @examples
-#' CDF_NP(2000, shape= 2, scale=100)
+#' cdf_NP(2000, shape= 2, scale=100)
 #' #[1] 0.9950125
-CDF_NP <- function(q, shape, scale) {
+cdf_NP <- function(q, shape, scale) {
   q <- as.numeric(q)
   ifelse(
     q < scale,

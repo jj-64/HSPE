@@ -2,8 +2,8 @@
 ## α > 0 scale
 ## β >  0  shape
 
-## CDF of Fisk -----------
-#' Fisk (Log-Logistic) CDF
+## cdf of Fisk -----------
+#' Fisk (Log-Logistic) cdf
 #'
 #' Computes the cumulative distribution function of the Fisk distribution
 #' with scale \code{scale > 0} and shape \code{shape > 0}.
@@ -12,16 +12,16 @@
 #' @param scale Positive scale parameter.
 #' @param shape Positive shape parameter.
 #'
-#' @return Numeric vector of CDF values.
+#' @return Numeric vector of cdf values.
 #'
 #' @details
-#' The Fisk / Log-logistic CDF is:
+#' The Fisk / Log-logistic cdf is:
 #' \deqn{ F(y) = \frac{1}{1 + (y/scale)^{-shape}} }
 #'
 #' @export
 #' @examples
-#' CDF_FISK(1:5, scale = 2, shape = 3)
-CDF_FISK <- function(y, scale, shape) {
+#' cdf_FISK(1:5, scale = 2, shape = 3)
+cdf_FISK <- function(y, scale, shape) {
   if (scale <= 0 || shape <= 0)
     stop("scale and shape must be > 0")
 
@@ -199,7 +199,7 @@ se_scale_FISK <- function(mean_y, Gini, se_mean, se_Gini,
 #' \deqn{
 #' L(p) = B(p; 1 + 1/shape,\; 1 - 1/shape)
 #' }
-#' where B is the incomplete beta CDF.
+#' where B is the incomplete beta cdf.
 #'
 #' @export
 #' @examples

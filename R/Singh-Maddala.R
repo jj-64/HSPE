@@ -1,4 +1,4 @@
-CDF_SM <- function(y, a, b, q)
+cdf_SM <- function(y, a, b, q)
 { VGAM::psinmad(q=y, scale = b , shape1.a = a, shape3.q = q) }
 
 Lorenz_SM <- function(p = seq(0.1,1,by =0.1), a, b, q) {

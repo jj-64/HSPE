@@ -6,7 +6,7 @@ PARAM_ROWS <- list()
 HC_ROWS    <- list()
 DIAG_ROWS  <- list()
 
-models <- names(CDF_registry)
+models <- names(cdf_registry)
 
 ## Loop over all countries #
 for (i in seq_len(nrow(data)) ){
@@ -48,7 +48,7 @@ for (i in seq_len(nrow(data)) ){
       PARAM_ROWS[[length(PARAM_ROWS) + 1]] <- tibble::tibble(
         Country = Country,
         model   = model,
-        param   = CDF_registry[[model]]$params,
+        param   = cdf_registry[[model]]$params,
         value   = NA_real_,
         se      = NA_real_
       )
@@ -88,10 +88,10 @@ for (i in seq_len(nrow(data)) ){
     )
 
     # --- B) HEADCOUNTS --------------------------
-    cdf_fun  <- CDF_registry[[model]]$cdffun #get()
+    cdf_fun  <- cdf_registry[[model]]$cdffun #get()
     HC       <-  cdf_fun(PL_vals, parlist)
 
-    HCse_fun <- CDF_registry[[model]]$HCsefun#get()
+    HCse_fun <- cdf_registry[[model]]$HCsefun#get()
     HC_se    <- sapply(PL_vals, function(z) HCse_fun(z, parlist, selist))
 
     HC_ROWS[[length(HC_ROWS) + 1]] <- tibble::tibble(
@@ -105,7 +105,7 @@ for (i in seq_len(nrow(data)) ){
     )
 
     # --- C) DIAGNOSTICS -------------------------
-    DIAG <-diagnostics_grouped(L_obs = L_values, Lorenz_fun = CDF_registry[[model]]$lorenzfun, parlist, N = N)
+    DIAG <-diagnostics_grouped(L_obs = L_values, Lorenz_fun = cdf_registry[[model]]$lorenzfun, parlist, N = N)
 
     DIAG_ROWS[[length(DIAG_ROWS) + 1]] <- tibble::tibble(
       Country = Country,

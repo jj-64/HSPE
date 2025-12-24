@@ -140,21 +140,21 @@ pdf_LN <- function(y, mu, sigma) {
 }
 
 
-## CDF of Lognormal, same as plnorm ------------
-#' Lognormal CDF Expressed Using (mean, sigma)
+## cdf of Lognormal, same as plnorm ------------
+#' Lognormal cdf Expressed Using (mean, sigma)
 #'
 #' @param y numerical vector for the mean income
 #' @param mean_y numerical value, average income
 #' @param sigma numerical value, lognormal scale positive parameter
 #'
-#' @return CDF, probability between 0 and 1
+#' @return cdf, probability between 0 and 1
 #' @export
 #' @examples
-#' CDF_LN(1500, mean_y = 6000, 0.6)
+#' cdf_LN(1500, mean_y = 6000, 0.6)
 #' [1] 0.02218964
-#' CDF_LN(c(1500,7500), mean_y = 6000, 0.6)
+#' cdf_LN(c(1500,7500), mean_y = 6000, 0.6)
 #' [1] 0.02218964 0.74917820
-CDF_LN <- function(y, mean_y , sigma) {
+cdf_LN <- function(y, mean_y , sigma) {
   if(sigma <=0) stop("sigma should be positive")
   if(!(is.na(mean_y)) & mean_y <=0) stop("mean_y should be positive")
   pnorm((log(y / mean_y) / sigma) + sigma/2)

@@ -1,10 +1,10 @@
 
 
-# CDF_B2 ------
-#' @title CDF of the Beta Prime (Beta-2) Distribution
+# cdf_B2 ------
+#' @title cdf of the Beta Prime (Beta-2) Distribution
 #'
 #' @description
-#' Computes the cumulative distribution function (CDF) of a **Beta Prime
+#' Computes the cumulative distribution function (cdf) of a **Beta Prime
 #' (Beta-2)** distribution:
 #'
 #' \deqn{F(y \mid p, q, b) = I_{\,y/(b+y)}(p, q)}
@@ -16,13 +16,13 @@
 #' @param p First shape parameter \eqn{p > 0}.
 #' @param q Second shape parameter \eqn{q > 0}.
 #'
-#' @return Numeric vector of CDF values.
+#' @return Numeric vector of cdf values.
 #'
 #' @examples
-#' CDF_B2(y = 1:5, b = 2, p = 3, q = 4)
+#' cdf_B2(y = 1:5, b = 2, p = 3, q = 4)
 #'
 #' @export
-CDF_B2 <- function(y, b, p, q) {
+cdf_B2 <- function(y, b, p, q) {
   # params: named vector or list with p, q, b
   z <- y / (b + y)
   # regularized incomplete beta
@@ -47,7 +47,7 @@ CDF_B2 <- function(y, b, p, q) {
 #' @param p First shape parameter \eqn{p > 0}.
 #' @param q Second shape parameter \eqn{q > 0}.
 #'
-#' @return Numeric vector of CDF values.
+#' @return Numeric vector of cdf values.
 #'
 #' @examples
 #' pdf_B2(y = 1:5, b = 2, p = 3, q = 4)
@@ -70,7 +70,7 @@ pdf_B2 <- function(y, b, p, q) {
 #' }
 #'
 #' where:
-#' - \eqn{Q(u)} is the quantile function (inverse CDF)
+#' - \eqn{Q(u)} is the quantile function (inverse cdf)
 #' - \eqn{B(\cdot,\cdot)} is the beta function
 #' - \eqn{u \in (0,1)}
 #'
@@ -99,7 +99,7 @@ Lorenz_B2 <- function(u, b, p, q) {
 #'
 #' @description
 #' Computes **delta-method standard errors** for poverty headcount measures
-#' based on the CDF of the **Beta-2 (Beta Prime)** distribution.
+#' based on the cdf of the **Beta-2 (Beta Prime)** distribution.
 #'
 #' For a poverty line \eqn{z}, the headcount is:
 #'

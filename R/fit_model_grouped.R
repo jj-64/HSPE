@@ -16,7 +16,7 @@
 #'
 #' @details
 #' The function looks up the corresponding fitting routine from
-#' `CDF_registry`, executes it, and returns parameter estimates
+#' `cdf_registry`, executes it, and returns parameter estimates
 #' together with their standard errors.
 #'
 #' @return A list with elements:
@@ -41,12 +41,12 @@ fit_model_grouped <- function(model = c("DA","SM","B2","GB2","FISK","LN","NP"),
 {
   model <- match.arg(model)
 
-  if (!model %in% names(CDF_registry)) {
+  if (!model %in% names(cdf_registry)) {
     stop("Unknown model: ", model, ". Must be one of: ",
-         paste(names(CDF_registry), collapse = ", "))
+         paste(names(cdf_registry), collapse = ", "))
   }
 
-  info <- CDF_registry[[model]]
+  info <- cdf_registry[[model]]
   fitfun <- info$fitfun
 
   tryCatch({

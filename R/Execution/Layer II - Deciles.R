@@ -43,9 +43,9 @@ for(i in 1:nrow(data) ){
   # KS_row  <- rep(NA, 6)
 
   # Fit each distribution
-    models <- names(CDF_registry)
+    models <- names(cdf_registry)
 
-    SUM_Param <- data.frame(Parameter = unique(unlist(lapply(CDF_registry, `[[`, "params"))))
+    SUM_Param <- data.frame(Parameter = unique(unlist(lapply(cdf_registry, `[[`, "params"))))
     SUM_Param$Country = Country
 
     results = list()
@@ -65,11 +65,11 @@ for(i in 1:nrow(data) ){
       SUM_Param <- compute_param_summary2(SUM_Param, model, fit$par, fit$se)
 
       # Compute headcounts
-      cdf_fun <- CDF_registry[[model]]$cdffun
+      cdf_fun <- cdf_registry[[model]]$cdffun
       HC <- cdf_fun(PL_vals, as.list(fit$par))
 
        ## Compute headcounts SE
-      HCSE_fun <-CDF_registry[[model]]$HCsefun
+      HCSE_fun <-cdf_registry[[model]]$HCsefun
       HC_SE <- #HCSE_fun(PL_vals, as.list(fit$par), as.list(fit$se))
               sapply(PL_vals, function(z) HCSE_fun(z,as.list(fit$par), as.list(fit$se) ))
                }
