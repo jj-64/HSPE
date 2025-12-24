@@ -1,3 +1,4 @@
+Config/testthat/edition: 3
 Package: HSPE
 Type: Package
 Title: Household Survey Parameter Estimation
@@ -6,7 +7,24 @@ Authors@R:
     person("Jinane", "Jouni", , "jinane.jouni@hotmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0007-7150-9065"))
 Description: fit distribution using mutiple data availability (limited, grouped and microdata)
-License: MIT
+License: GPL-3
 Encoding: UTF-8
+LazyData: true
 RoxygenNote: 7.3.2
 Depends: R (>= 3.6)
+Imports:
+    stats,
+    utils,
+    dplyr,
+    tidyr,
+    GB2,
+    GB2group,
+    fitdistriplus,
+    numDeriv
+Suggests:
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown,
+    devtools
+VignetteBuilder: knitr
+
