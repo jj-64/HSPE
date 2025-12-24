@@ -18,17 +18,17 @@ lapply(required_packages, library, character.only = TRUE)
 theme_set(theme_void(base_family = "Roboto"))
 
 theme_update(
-  axis.text.x = element_text(color = "black", face = "bold", size = 12, margin = margin(t = 6)),
-  axis.text.y = element_text(color = "black", size = 12, hjust = 1, margin = margin(r = 6), family = "Roboto Mono"),
-  axis.line.x = element_line(color = "black", size = 1),panel.grid.major.y = element_line(color = "grey90", size = .6),
+  axis.text.x = element_text(color = "black", face = "bold", size = 22, margin = margin(t = 10)),
+  axis.text.y = element_text(color = "black", size = 15, hjust = 1, margin = margin(r = 6), family = "Roboto Mono"),
+  axis.line.x = element_line(color = "white", size = 5),panel.grid.major.y = element_line(color = "grey90", size = .6),
   plot.background = element_rect(fill = "white", color = "white"),
   plot.margin = margin(rep(20, 4)))
 
 ## custom colors
 my_pal <- rcartocolor::carto_pal(n = 8, name = "Bold")
-##"#7F3C8D" "#11A579" "#3969AC" "#F2B701" "#E73F74" "#80BA5A" "#E68310" "#A5AA99"
-## 1:purple, 2:green,3:blue,4:yellow, 5:red, 6:limegreen, 7:orange, 8:gray
-
+##"#7F3C8D" "#11A579" "#3969AC" "#F2B701" "#E73F74" "#80BA5A"   "#E68310" "#A5AA99"
+## 1:purple, 2:green,  3:blue,  4:yellow, 5:fushia, 6:limegreen, 7:orange, 8:gray
+"#7F3C8D" "#11A579" "#3969AC" "#F2B701" "#E73F74" "#80BA5A" "#E68310" "#A5AA99"
 pov_line = 0.8
 
 ## Limited Data -------------------
@@ -74,10 +74,10 @@ data_grouped <- HC_grouped_data %>%
   )
 
 ## boxplot absolute
-ggplot(data_grouped, aes(x = model, y = abs, color = model, fill = model)) +
-  scale_y_continuous(limits = c(-0.5, 0.5)) + #n.breaks = c(-10,0,10,20,30,40)
-  scale_color_manual(values = my_pal[c(8,1:7)], guide = "none") +
-  scale_fill_manual(values = my_pal[c(8, 1:7)], guide = "none") +
+ggplot(data_grouped, aes(x = model, y = abs*100, color = model, fill = model)) +
+  scale_y_continuous(limits = c(-20, 20)) + #n.breaks = c(-10,0,10,20,30,40)
+  scale_color_manual(values = my_pal[c(7,1:6)], guide = "none") +
+  scale_fill_manual(values = my_pal[c(7, 1:6)], guide = "none") +
   geom_violin(
     #aes(fill = model,fill = after_scale(colorspace::lighten(fill, .5))),
     #size = 1, bw=0.9
