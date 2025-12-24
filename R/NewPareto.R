@@ -1,15 +1,3 @@
-#install.packages("hypergeo")
-#library(hypergeo)
-#library(nloptr)
-# packages
-# if (!requireNamespace("numDeriv", quietly = TRUE)) {
-#   install.packages("numDeriv")
-# }
-# if (!requireNamespace("dplyr", quietly = TRUE)) {
-#   install.packages("dplyr")
-# }
-# library(numDeriv)
-# library(dplyr)
 
 ## alpha is shape
 ## beta is scale
