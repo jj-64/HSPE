@@ -95,7 +95,7 @@ CDF_registry <- list(
   FISK = list(
     params = c("a", "b"),
 
-    fitfun = "fitgroup.f",
+    fitfun = GB2group::fitgroup.f, #"fitgroup.f",
 
     cdffun = function(y, pars) {
       CDF_FISK(y, scale = pars$b, shape = pars$a )
@@ -120,7 +120,7 @@ CDF_registry <- list(
   NP = list(
     params = c("shape", "scale"),
 
-    fitfun = "fitgroup.np",
+    fitfun = GB2group::fitgroup.np, #"fitgroup.np",
 
     cdffun = function(y, pars) {
       CDF_NP(y, scale = pars$scale, shape = pars$shape )
@@ -145,7 +145,7 @@ CDF_registry <- list(
   SM = list(
     params = c("a","b","q"),
 
-    fitfun = "fitgroup.sm",
+    fitfun = GB2group::fitgroup.sm, #"fitgroup.sm",
 
     cdffun = function(y, pars) {
       1 - (1 + (y/pars$b)^pars$a)^(-pars$q)
@@ -172,7 +172,7 @@ CDF_registry <- list(
   DA = list(
     params = c("a","b","p"),
 
-    fitfun = "fitgroup.da",
+    fitfun = GB2group::fitgroup.da, #"fitgroup.da",
 
     cdffun = function(y, pars) {
       (1 + (pars$b / y)^pars$a)^(-pars$p)
@@ -199,7 +199,7 @@ CDF_registry <- list(
   GB2 = list(
     params = c("a","b","p","q"),
 
-    fitfun = "fitgroup.gb2",
+    fitfun = GB2group::fitgroup.gb2, #"fitgroup.gb2",
 
     cdffun = function(y, pars) {
       z <- (y/pars$b)^pars$a
@@ -229,7 +229,7 @@ CDF_registry <- list(
   B2 = list(
     params = c("b","p","q"),
 
-    fitfun = "fitgroup.b2",
+    fitfun = GB2group::fitgroup.b2, #"fitgroup.b2",
 
     cdffun = function(y, pars) {
       CDF_B2(y, b= pars$b, p=pars$p, q=pars$q)
