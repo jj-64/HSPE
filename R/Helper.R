@@ -97,71 +97,81 @@ compute_headcounts_limited <- function(
     Fisk_shape  = NULL,
     LN_sigma   = NULL,
     NP_shape   = NULL,
-    NP_scale    = NULL
+    NP_scale   = NULL,
+    Country    = NA_character_
 ) {
 
-  # --- Normalize and validate models input ---
+  # --- Normalize models ---
   models <- tolower(models)
-  valid_models <- c("all", "ln", "fisk", "np", "lognormal", "Fisk", "NewPareto", "newpareto")
+  valid_models <- c("all", "LN", "FISK", "NP", "lognormal", "Fisk", "NewPareto", "newpareto")
   if (!all(models %in% valid_models)) {
     stop("models must be one of: all, LN, FISK, NP")
   }
   if ("all" %in% models) {
-    models <- c("ln", "fisk", "np")
+    models <- c("LN", "FISK", "NP")
   }
+  out <- list()
 
-  # Prepare result container:
-  HC <- data.frame(
-    Observed = PL_vals$obs,
-    row.names = PL_vals$ratio
-  )
+  for (i in seq_along(PL_vals$pl)) {
 
-  # --------------------------------------------------------
-  # FISK headcounts
-  # --------------------------------------------------------
-  if ("fisk" %in% models) {
-    if (is.null(Fisk_scale) || is.null(Fisk_shape)) {
-      stop("FISK parameters (Fisk_scale, Fisk_shape) must be provided when models include 'FISK'.")
+    pl  <- PL_vals$pl[i]
+    thr <- PL_vals$ratio[i]
+    obs <- PL_vals$obs[i]
+
+    # Observed HC
+    # out[[length(out) + 1]] <- data.frame(
+    #   Country      = Country,
+    #   model        = "Observed_HC",
+    #   threshold    = thr,
+    #   PL           = pl,
+    #   HC           = obs,
+    #   HC_se        = NA_real_,
+    #   observed_HC = obs
+    # )
+
+    # FISK
+    if ("FISK" %in% models) {
+      out[[length(out) + 1]] <- data.frame(
+        Country      = Country,
+        model        = "FISK",
+        threshold    = thr,
+        PL           = pl,
+        HC           = cdf_FISK(y = pl, scale = Fisk_scale, shape = Fisk_shape),
+        HC_se        = NA_real_,   # attach later
+        observed_HC = obs
+      )
     }
 
-    HC$FISK_H <- sapply(
-      PL_vals$pl,
-      function(p) cdf_FISK(y = p, scale = Fisk_scale, shape = Fisk_shape)
-    )
-  }
-
-  # --------------------------------------------------------
-  # Lognormal headcounts
-  # --------------------------------------------------------
-  if ("ln" %in% models) {
-    if (is.null(Average) || is.null(LN_sigma)) {
-      stop("LN parameters (Average, LN_sigma) must be provided when models include 'LN'.")
+    # Lognormal
+    if ("LN" %in% models) {
+      out[[length(out) + 1]] <- data.frame(
+        Country      = Country,
+        model        = "LN",
+        threshold    = thr,
+        PL           = pl,
+        HC           = pnorm((log(pl / Average) / LN_sigma) + LN_sigma / 2),
+        HC_se        = NA_real_,
+        observed_HC = obs
+      )
     }
 
-    HC$LN_H <- sapply(
-      PL_vals$pl,
-      function(p) pnorm( (log(p / Average) / LN_sigma) + LN_sigma / 2 )
-    )
-  }
-
-  # --------------------------------------------------------
-  # New Pareto headcounts
-  # --------------------------------------------------------
-  if ("np" %in% models) {
-    if (is.null(NP_shape) || is.null(NP_scale)) {
-      stop("NP parameters (NP_shape, NP_scale) must be provided when models include 'NP'.")
+    # New Pareto
+    if ("NP" %in% models) {
+      out[[length(out) + 1]] <- data.frame(
+        Country      = Country,
+        model        = "NP",
+        threshold    = thr,
+        PL           = pl,
+        HC           = cdf_NP(pl, shape = NP_shape, scale = NP_scale),
+        HC_se        = NA_real_,
+        observed_HC = obs
+      )
     }
-
-    HC$NP_H <- sapply(
-      PL_vals$pl,
-      function(p) cdf_NP(p, shape = NP_shape, scale = NP_scale)
-    )
   }
 
-  #rownames(HC) = PL_vals$ratio
-  HC$threshold = PL_vals$ratio
-  return(HC)
+  do.call(rbind, out)
 }
+
 
 # Helper function: parameters summary -------------------------
 #' Summarize Estimated Distribution Parameters and Standard Errors
@@ -213,19 +223,27 @@ compute_param_summary <- function(
     NP_shape, NP_scale,
     se_Fisk_scale = NA, se_Fisk_shape = NA,
     se_LN_mu = NA, se_LN_sigma = NA,
-    se_NP_shape = NA, se_NP_scale = NA
+    se_NP_shape = NA, se_NP_scale = NA,
+    Country = NA_character_
 ) {
+
   data.frame(
-    Parameter = c("shape/μ", "scale/σ"),
-    Fisk     = c(Fisk_shape, Fisk_scale),
-    Fisk_SE  = c(se_Fisk_shape, se_Fisk_scale),
-    LN       = c(LN_mu, LN_sigma),
-    LN_SE    = c(se_LN_mu, se_LN_sigma),
-    NP       = c(NP_shape, NP_scale),
-    NP_SE    = c(se_NP_shape, se_NP_scale),
-    row.names = NULL
+    Country = Country,
+    model   = rep(c("FISK", "LN", "NP"), each = 2),
+    Param   = rep(c("shape", "scale"), times = 3),
+    value   = c(
+      Fisk_shape, Fisk_scale,
+      LN_mu,     LN_sigma,
+      NP_shape,  NP_scale
+    ),
+    se      = c(
+      se_Fisk_shape, se_Fisk_scale,
+      se_LN_mu,      se_LN_sigma,
+      se_NP_shape,   se_NP_scale
+    )
   )
 }
+
 
 # Helper function: Headcount Ratio Variance-------------------------
 
