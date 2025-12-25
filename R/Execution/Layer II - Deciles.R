@@ -1,5 +1,5 @@
-load("data/SumData.rda")
-
+#load("data/SumData.rda")
+data(SumData)
 # -------------------------
 # MAIN LOOP
 # -------------------------

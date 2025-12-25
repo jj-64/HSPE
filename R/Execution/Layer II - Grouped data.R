@@ -1,6 +1,6 @@
-load("data/SumData.rda")
+#load("data/SumData.rda")
 #load("data/HC_Grouped data.rda")
-
+data(SumData)
 # final storage as clean long-format tibbles
 PARAM_ROWS <- list()
 HC_ROWS    <- list()
