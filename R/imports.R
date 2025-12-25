@@ -1,4 +1,4 @@
-#' @importFrom stats pnorm dnorm qnorm pbeta Re integrate ks.test
+#' @importFrom stats pnorm dnorm qnorm pbeta integrate ks.test
 #'
 #' @importFrom utils head tail install.packages setTxtProgressBar txtProgressBar
 #'
@@ -7,8 +7,7 @@
 #' @importFrom dplyr bind_cols bind_rows left_join select slice ungroup
 #' @importFrom tidyr pivot_wider pivot_longer
 #' @importFrom numDeriv grad hessian
-#' @importFrom GB2group fitgroup.ln fitgroup.f fitgroup.da fitgroup.b2
-#' fitgroup.gb2 fitgroup.np fitgroup.sm
+#' @importFrom GB2group fitgroup.ln fitgroup.f fitgroup.da fitgroup.b2 fitgroup.gb2 fitgroup.sm
 #' @importFrom VGAM psinmad ddagum pdagum qdagum dfisk pfisk qfisk dpareto
 #' @importFrom hypergeo hypergeo
 #' @importFrom nloptr nloptr
