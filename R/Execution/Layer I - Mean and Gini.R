@@ -1,5 +1,5 @@
-load("data/SumData.rda")
-
+#load("data/SumData.rda")
+data("SumData")
 # -------------------------
 # MAIN LOOP
 # -------------------------
@@ -53,18 +53,7 @@ for (i in 1:nrow(data)  ) {
     obs = HC_obs
   )
 
-  # --- Compute headcounts ---
-  SUM_H <- compute_headcounts_limited(PL_vals = PL_vals,
-                              models = c("all"), # "LN", "FISK", "NP"
-                              Average = Average,
-                              Fisk_scale = Fisk_scale,
-                              Fisk_shape  = Fisk_shape,
-                              LN_sigma   = LN_sigma,
-                              NP_scale   = NP_scale,
-                              NP_shape    = NP_shape)
-  SUM_H$Country <- data$Country[i]
-
-  ## Standard Errors for Estimated Parameters
+  ## --- Standard Errors for Estimated Parameters ---
       ## Fisk
   if(!is.na(se_Gini1) & !is.na(se_Average)){
     se_Fisk_shape = fit$FISK$se["se_shape"]
@@ -87,9 +76,19 @@ for (i in 1:nrow(data)  ) {
                                          NP_shape = NP_shape, NP_scale = NP_scale,
                                          se_Fisk_shape = se_Fisk_shape, se_Fisk_scale = se_Fisk_scale,
                                          se_LN_mu = se_LN_mu, se_LN_sigma = se_LN_sigma,
-                                         se_NP_shape = se_NP_shape, se_NP_scale = se_NP_scale)
+                                         se_NP_shape = se_NP_shape, se_NP_scale = se_NP_scale,
+                                         Country = Country)
 
-  SUM_Param$Country <- data$Country[i]
+  # --- Compute headcounts ---
+  SUM_H <- compute_headcounts_limited(PL_vals = PL_vals,
+                                      models = c("all"), # "LN", "FISK", "NP"
+                                      Average = Average,
+                                      Fisk_scale = Fisk_scale,
+                                      Fisk_shape  = Fisk_shape,
+                                      LN_sigma   = LN_sigma,
+                                      NP_scale   = NP_scale,
+                                      NP_shape    = NP_shape,
+                                      Country = Country)
 
   # --- Compute Hedacount standard error ----
   if(!is.na(se_Gini1) & !is.na(se_Average)){
@@ -103,9 +102,8 @@ for (i in 1:nrow(data)  ) {
       se_shape = se_Fisk_shape
     )
   )
-  SUM_H$"FISK_H_SE" = as.numeric(FISK_SE)
-  SUM_CI_Fisk = conf_bound(SUM_H[,"FISK_H"],FISK_SE)
-  colnames(SUM_CI_Fisk) = paste0("FISK_H_",c("lower", "upper"))
+  SUM_H[SUM_H$model=="FISK","HC_se"] = as.numeric(FISK_SE)
+
 
   LN_SE <- sapply(
     PL_vals$pl,
@@ -116,9 +114,7 @@ for (i in 1:nrow(data)  ) {
                 se_sigma = se_LN_sigma,
                 cov_mu_sigma = 0)
   )
-  SUM_H$"LN_H_SE" = as.numeric(LN_SE)
-  SUM_CI_LN = conf_bound(SUM_H[,"LN_H"],LN_SE)
-  colnames(SUM_CI_LN) = paste0("LN_H_",c("lower", "upper"))
+  SUM_H[SUM_H$model=="LN","HC_se"] = as.numeric(LN_SE)
 
   NP_SE <- sapply(
     PL_vals$pl,
@@ -130,27 +126,42 @@ for (i in 1:nrow(data)  ) {
       se_shape = se_NP_shape
     )
   )
-  SUM_H$"NP_H_SE" = as.numeric(NP_SE)
-  SUM_CI_NP = conf_bound(SUM_H[,"NP_H"],NP_SE)
-  colnames(SUM_CI_NP) = paste0("NP_H_",c("lower", "upper"))
+  SUM_H[SUM_H$model=="NP","HC_se"] = as.numeric(NP_SE)
 
-  OBS_CI <- data.frame(
-    Country = data$Country[i],
+  OBS_CI <- tibble(
+    Country   = data$Country[i],
+    model     = "observed",
     threshold = thresholds,
-    Obs_lower = as.numeric(data[i, ci_lower_cols]),
-    Obs_upper = as.numeric(data[i, ci_upper_cols])
+    lower     = as.numeric(data[i, ci_lower_cols]),
+    upper     = as.numeric(data[i, ci_upper_cols])
   )
+
+  CI_param <- tibble(
+    model = c("LN", "FISK", "NP"),
+    se    = list(LN_SE, FISK_SE, NP_SE)
+  ) %>%
+    mutate(
+      CI = map2(
+        model, se,
+        ~ conf_bound(
+          SUM_H %>% filter(model == .x) %>% pull(HC),
+          .y
+        )
+      )
+    ) %>%
+    select(-se) %>%
+    unnest(CI) %>%
+    mutate(
+      threshold = rep(thresholds,3),
+      Country   = data$Country[i]
+    )
+
   }
 
   # Store results
   combined_HC[[i]]  <- SUM_H
   combined_Param[[i]] <- SUM_Param
-  combined_CI[[i]]  <- dplyr::bind_cols(
-    OBS_CI,
-    SUM_CI_Fisk,
-    SUM_CI_LN,
-    SUM_CI_NP
-  )
+  combined_CI[[i]]  <- dplyr::bind_rows(OBS_CI, CI_param)
 
   message(paste("Done Country", data$Country[i],"..."))
 }
