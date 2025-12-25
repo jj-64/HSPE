@@ -114,7 +114,7 @@ cdf_registry <- list(
   NP = list(
     params = c("shape", "scale"),
 
-    fitfun = GB2group::fitgroup.np, #"fitgroup.np",
+    fitfun = fitgroup.np,
 
     cdffun = function(y, pars) {
       cdf_NP(y, scale = pars$scale, shape = pars$shape )
